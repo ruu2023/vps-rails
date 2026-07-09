@@ -15,45 +15,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Rubyのセットアップ（Kamalを実行するために必要）
+      # 2. Rubyのセットアップ（bundler-cacheで次回から一瞬に）
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4.1" # あなたの開発環境のRubyバージョンに合わせて調整してください
+          ruby-version: "3.4.1"
           bundler-cache: true
 
-      # 3. SSH鍵の配置と起動（Kamalがサーバーに接続できるようにする）
+      # 3. Kamalのインストール（最新版を固定してインストール）
+      - name: Install Kamal
+        run: gem install kamal
+
+      # 4. SSH鍵の配置と起動
       - name: Set up SSH Key
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # 4. 念のため、Kamalを実行する前に既存の古いKamalビルダーの残骸をクレンジングしておく
-      - name: Clear potentially broken kamal builders
-        run: |
-          docker buildx rm kamal-local-docker-container 2>/dev/null || true
+      # 5. GitHub Actionsに最適化されたDocker Buildxをセットアップ
+      # これを入れることで、GitHub Actionsのキャッシュ（gha）との連携が100%発揮されます
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # 5. Kamalのインストール
-      - name: Install Kamal
-        run: gem install kamal
-
-      # 1. 先にDocker公式のActionを使い、ホストとBuildxの両方に認証を通す
+      # 6. Docker Hubへのログイン
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: kokihiru
           password: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
 
-      # 6. デプロイの実行（GitHubのSecretsを環境変数として注入）
+      # 7. デプロイの実行
       - name: Run Kamal Deploy
         env:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-          DOCKER_BUILDKIT: 1
         run: |
-          mkdir -p ~/.ssh
-
-          # 念のため、過去の隔離された不完全なBuilderキャッシュがあれば削除
-          docker buildx rm kamal-local-docker-container || true
-
+          # 認証を通した状態で、Kamalにビルドとデプロイを任せる
+          # deploy.ymlに書いた cache: type: gha を自動的に認識して爆速になります
           kamal deploy

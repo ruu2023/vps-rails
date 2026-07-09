@@ -47,6 +47,8 @@ asset_path: /rails/public/assets
 # Configure the image builder.
 builder:
   arch: amd64
+  cache:
+    type: gha
 
 # Use a different ssh user than root
 ssh:
