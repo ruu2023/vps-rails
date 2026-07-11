@@ -23,6 +23,8 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - GOOGLE_OAUTH_CLIENT_ID
+    - GOOGLE_OAUTH_CLIENT_SECRET
   clear:
     SOLID_QUEUE_IN_PUMA: true
 
