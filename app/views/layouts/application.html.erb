@@ -18,30 +18,19 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
+
     <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <% if logged_in? %>
-      <nav>
-        <%= link_to "ダッシュボード", kaikei_dashboard_path %>
-        <%= link_to "取引", kaikei_transactions_path %>
-        <%= link_to "科目", kaikei_categories_path %>
-        <%= link_to "支払方法", kaikei_payment_methods_path %>
-        <%= link_to "予算", kaikei_budgets_path %>
-        <%= link_to "エクスポート", new_kaikei_exports_path %>
-        <%= button_to "ログアウト", logout_path, method: :delete %>
-      </nav>
-    <% end %>
-
     <% flash.each do |type, message| %>
       <p class="flash flash-<%= type %>"><%= message %></p>
     <% end %>
 
-    <main>
-      <%= yield %>
-    </main>
+    <%= content_for?(:content_for_layout) ? yield(:content_for_layout) : yield %>
   </body>
 </html>

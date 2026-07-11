@@ -8,11 +8,13 @@ Rails.application.routes.draw do
 
   namespace :kaikei do
     resource :dashboard, only: :show
+    resource :analytics, only: :show
     resources :transactions, except: :show
     resources :categories, except: :show
     resources :payment_methods, except: :show
     resources :budgets, only: [ :index, :create, :update, :destroy ]
     resource :exports, only: [ :new, :create ]
+    resource :settings, only: :show
   end
 
   root to: redirect("/kaikei/dashboard")

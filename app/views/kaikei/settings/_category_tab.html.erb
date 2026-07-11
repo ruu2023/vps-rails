@@ -1,0 +1,31 @@
+<div class="mx-4 mt-4 flex items-center justify-between">
+  <h2 class="text-lg font-semibold text-kaikei-text">科目管理</h2>
+  <button type="button" data-action="click->kaikei--settings#openNewCategoryModal"
+    class="flex items-center gap-1 rounded-full bg-kaikei-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+    <i class="fa-solid fa-plus"></i> 新規追加
+  </button>
+</div>
+
+<section class="mx-4 mt-4">
+  <h3 class="border-b border-black/10 pb-2 text-sm font-semibold text-kaikei-text">収入科目</h3>
+  <ul class="mt-3 space-y-2">
+    <% if @income_categories.empty? %>
+      <li class="py-2 text-sm text-kaikei-text-subtle">収入科目が登録されていません。</li>
+    <% end %>
+    <% @income_categories.each do |category| %>
+      <%= render "category_row", category: category %>
+    <% end %>
+  </ul>
+</section>
+
+<section class="mx-4 mt-4 mb-4">
+  <h3 class="border-b border-black/10 pb-2 text-sm font-semibold text-kaikei-text">支出科目</h3>
+  <ul class="mt-3 space-y-2">
+    <% if @expense_categories.empty? %>
+      <li class="py-2 text-sm text-kaikei-text-subtle">支出科目が登録されていません。</li>
+    <% end %>
+    <% @expense_categories.each do |category| %>
+      <%= render "category_row", category: category %>
+    <% end %>
+  </ul>
+</section>

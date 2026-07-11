@@ -1,3 +1,8 @@
-<h1>取引の登録</h1>
+<% content_for :kaikei_header do %>
+  <h1 class="text-xl font-semibold text-kaikei-text">取引登録</h1>
+  <%= link_to kaikei_dashboard_path, class: "flex h-9 w-9 items-center justify-center rounded-full text-kaikei-text-muted" do %>
+    <i class="fa-solid fa-xmark text-xl"></i>
+  <% end %>
+<% end %>
 
-<%= render "form", transaction: @transaction, url: kaikei_transactions_path %>
+<%= render "form", transaction: @transaction, url: kaikei_transactions_path, submit_label: "登録する" %>

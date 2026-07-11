@@ -1,0 +1,18 @@
+<%# locals: category: %>
+<li class="flex items-center justify-between gap-3 rounded-kaikei-control border border-black/5 bg-white px-4 py-3 shadow-sm">
+  <div class="flex items-center gap-3">
+    <%= render "kaikei/shared/category_icon", category: category %>
+    <span class="text-sm font-medium text-kaikei-text"><%= category.name %></span>
+  </div>
+  <div class="flex items-center gap-2">
+    <button type="button" data-action="click->kaikei--settings#openEditCategoryModal"
+      data-id="<%= category.id %>" data-name="<%= category.name %>" data-icon="<%= category.icon %>" data-default-type="<%= category.default_type %>"
+      class="flex h-8 w-8 items-center justify-center rounded-full text-kaikei-text-muted hover:bg-kaikei-bg">
+      <i class="fa-solid fa-pen text-sm"></i>
+    </button>
+    <button type="button" data-action="click->kaikei--settings#openDeleteCategoryModal" data-id="<%= category.id %>"
+      class="flex h-8 w-8 items-center justify-center rounded-full text-kaikei-text-muted hover:bg-kaikei-expense/10 hover:text-kaikei-expense">
+      <i class="fa-solid fa-trash text-sm"></i>
+    </button>
+  </div>
+</li>

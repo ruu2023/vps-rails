@@ -35,6 +35,17 @@
 - Stimulus コントローラ: `app/javascript/controllers/<機能>/`
 - 機能固有の concern やサービスも `<機能>/` サブディレクトリに置く。
 
+## レイアウト構成
+
+- `app/views/layouts/application.html.erb` は全機能共通のシェル(html/head/body/yield
+  と CSS・JS・Font Awesome の読み込み)だけを持つ。機能固有のヘッダー・ナビ・
+  レイアウト枠をここに足さない。
+- 各機能のヘッダー・ナビ・レイアウト枠は `app/views/layouts/<機能>.html.erb`
+  (名前空間レイアウト)に置き、`app/views/<機能>/shared/` のパーシャルを
+  描画する形にする。名前空間レイアウトは application レイアウトを内側から
+  包む(`render template: "layouts/application" do ... end`)。
+- 機能の base controller で `layout "<機能>"` を指定する。
+
 ## 認証
 
 - 認証はアプリ全体で共通、Google OAuth のみに一本化する

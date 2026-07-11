@@ -1,54 +1,84 @@
-<%= form_with model: transaction, scope: :kaikei_transaction, url: url, local: true,
-      data: { controller: "kaikei--transaction-form" } do |f| %>
-  <% if transaction.errors.any? %>
-    <ul>
-      <% transaction.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
+<% input_class = "w-full rounded-kaikei-control bg-kaikei-bg px-4 py-3 text-kaikei-text placeholder:text-kaikei-text-subtle focus:outline-none focus:ring-2 focus:ring-kaikei-primary/20" %>
+<% submit_label = local_assigns.fetch(:submit_label, "保存") %>
+<% initial_type = transaction.type.presence || "income" %>
+
+<section class="mx-4 mt-4 rounded-kaikei-card bg-white p-5 shadow-kaikei-section">
+  <%= form_with model: transaction, scope: :kaikei_transaction, url: url, local: true,
+        data: { controller: "kaikei--transaction-form" }, class: "space-y-6" do |f| %>
+    <% if transaction.errors.any? %>
+      <ul class="space-y-1 rounded-kaikei-control bg-kaikei-expense/10 p-3 text-sm text-kaikei-expense">
+        <% transaction.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div>
+      <%= f.label :date, "日付", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <%= f.date_field :date, class: input_class %>
+    </div>
+
+    <div>
+      <%= f.label :client_name, "取引先", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <%= f.text_field :client_name, placeholder: "例：○○銀行、○○クライアント", class: input_class %>
+    </div>
+
+    <div>
+      <%= f.label :category_id, "科目", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <%= f.select :category_id,
+            grouped_options_for_select(
+              [
+                [ "収入", @categories.select { |c| c.default_type == "income" }.map { |c| [ c.name, c.id, { data: { default_type: c.default_type } } ] } ],
+                [ "支出", @categories.select { |c| c.default_type == "expense" }.map { |c| [ c.name, c.id, { data: { default_type: c.default_type } } ] } ],
+              ],
+              transaction.category_id
+            ),
+            { include_blank: "科目を選択してください" },
+            data: { "kaikei--transaction-form-target": "category", action: "change->kaikei--transaction-form#syncType" },
+            class: input_class %>
+    </div>
+
+    <div>
+      <%= f.label :type, "収支区分", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <div class="flex overflow-hidden rounded-kaikei-control">
+        <button type="button" data-type="income" data-action="click->kaikei--transaction-form#selectType"
+          data-kaikei--transaction-form-target="typeOption"
+          class="flex-1 py-3 text-center font-medium <%= initial_type == "income" ? "bg-kaikei-income text-white" : "bg-white text-kaikei-income" %>">収入</button>
+        <button type="button" data-type="expense" data-action="click->kaikei--transaction-form#selectType"
+          data-kaikei--transaction-form-target="typeOption"
+          class="flex-1 py-3 text-center font-medium <%= initial_type == "expense" ? "bg-kaikei-expense text-white" : "bg-white text-kaikei-expense" %>">支出</button>
+      </div>
+      <%= f.hidden_field :type, value: initial_type, data: { "kaikei--transaction-form-target": "type" } %>
+    </div>
+
+    <div>
+      <%= f.label :payment_method_id, "支払方法", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <%= f.select :payment_method_id,
+            options_for_select(
+              @payment_methods.map { |pm| [ pm.name, pm.id, { data: { type: pm.type } } ] },
+              transaction.payment_method_id
+            ),
+            { include_blank: "支払方法を選択してください" },
+            data: { "kaikei--transaction-form-target": "paymentMethod" },
+            class: input_class %>
+    </div>
+
+    <div>
+      <%= f.label :amount, "金額", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <div class="relative">
+        <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-kaikei-text-subtle">&yen;</span>
+        <%= f.number_field :amount, min: 0, class: "#{input_class} pl-9" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :memo, "メモ", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <%= f.text_area :memo, rows: 4, placeholder: "取引に関するメモ", class: "#{input_class} min-h-[100px]" %>
+    </div>
+
+    <%= f.button type: "submit", class: "flex w-full cursor-pointer items-center justify-center gap-2 rounded-kaikei-control bg-kaikei-primary py-3 font-semibold text-white hover:opacity-90" do %>
+      <i class="fa-solid fa-check"></i>
+      <%= submit_label %>
+    <% end %>
   <% end %>
-
-  <div>
-    <%= f.label :date, "日付" %>
-    <%= f.date_field :date %>
-  </div>
-
-  <div>
-    <%= f.label :category_id, "科目" %>
-    <%= f.select :category_id,
-          options_for_select(
-            @categories.map { |c| [ c.name, c.id, { data: { default_type: c.default_type } } ] },
-            transaction.category_id
-          ),
-          { include_blank: true },
-          data: { "kaikei--transaction-form-target": "category", action: "change->kaikei--transaction-form#syncType" } %>
-  </div>
-
-  <div>
-    <%= f.label :type, "収支区分" %>
-    <%= f.select :type, [ [ "収入", "income" ], [ "支出", "expense" ] ],
-          {}, data: { "kaikei--transaction-form-target": "type" } %>
-  </div>
-
-  <div>
-    <%= f.label :payment_method_id, "支払方法" %>
-    <%= f.collection_select :payment_method_id, @payment_methods, :id, :name, include_blank: true %>
-  </div>
-
-  <div>
-    <%= f.label :client_name, "取引先" %>
-    <%= f.text_field :client_name %>
-  </div>
-
-  <div>
-    <%= f.label :amount, "金額" %>
-    <%= f.number_field :amount, min: 0 %>
-  </div>
-
-  <div>
-    <%= f.label :memo, "メモ" %>
-    <%= f.text_area :memo %>
-  </div>
-
-  <%= f.submit "保存" %>
-<% end %>
+</section>

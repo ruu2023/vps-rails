@@ -1,0 +1,18 @@
+<%
+  active_nav_key = case params[:controller].split("/").last
+  when "dashboards" then :home
+  when "transactions" then :transactions
+  when "analytics" then :analytics
+  else :settings
+  end
+%>
+<% content_for :content_for_layout do %>
+  <div class="mx-auto min-h-screen max-w-[480px] bg-kaikei-bg pb-4">
+    <%= render "kaikei/shared/header" %>
+    <main>
+      <%= yield %>
+    </main>
+  </div>
+  <%= render "kaikei/shared/bottom_nav", active: active_nav_key %>
+<% end %>
+<%= render template: "layouts/application" %>

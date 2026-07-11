@@ -1,0 +1,12 @@
+<%# locals: payment_method: %>
+<li>
+  <%= form_with model: payment_method, scope: :kaikei_payment_method, url: kaikei_payment_method_path(payment_method), method: :patch, local: true,
+        class: "flex items-center gap-2 rounded-kaikei-control border border-black/5 bg-white px-3 py-3 shadow-sm" do |f| %>
+    <%= f.text_field :name, class: "min-w-0 flex-[2] rounded-kaikei-control bg-kaikei-bg px-3 py-2 text-sm text-kaikei-text focus:outline-none focus:ring-2 focus:ring-kaikei-primary/20" %>
+    <%= f.select :type, [ [ "支出", "expense" ], [ "収入", "income" ] ], {},
+          class: "flex-1 rounded-kaikei-control bg-kaikei-bg px-3 py-2 text-sm text-kaikei-text focus:outline-none focus:ring-2 focus:ring-kaikei-primary/20" %>
+    <%= f.button type: "submit", class: "shrink-0 cursor-pointer rounded-full bg-kaikei-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90" do %>
+      更新
+    <% end %>
+  <% end %>
+</li>

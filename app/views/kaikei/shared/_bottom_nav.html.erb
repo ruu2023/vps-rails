@@ -1,0 +1,19 @@
+<%# locals: active: (:home, :transactions, :analytics, :settings) %>
+<%
+  nav_items = [
+    { key: :home, label: "ホーム", path: kaikei_dashboard_path, icon: "fa-house" },
+    { key: :transactions, label: "取引", path: new_kaikei_transaction_path, icon: "fa-right-left" },
+    { key: :analytics, label: "分析", path: kaikei_analytics_path, icon: "fa-chart-line" },
+    { key: :settings, label: "設定", path: kaikei_settings_path, icon: "fa-gear" },
+  ]
+%>
+<div class="h-16" aria-hidden="true"></div>
+<nav class="fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-[480px] border-t border-black/10 bg-white shadow-kaikei-section" aria-label="下部ナビゲーション">
+  <% nav_items.each do |item| %>
+    <% is_active = active == item[:key] %>
+    <%= link_to item[:path], class: "flex flex-1 flex-col items-center gap-1 py-2 text-xs #{is_active ? "text-kaikei-primary" : "text-kaikei-text-subtle"}" do %>
+      <i class="fa-solid <%= item[:icon] %> text-base"></i>
+      <span><%= item[:label] %></span>
+    <% end %>
+  <% end %>
+</nav>

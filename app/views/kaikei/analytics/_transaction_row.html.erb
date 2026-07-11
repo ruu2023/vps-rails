@@ -1,0 +1,20 @@
+<%# locals: transaction: %>
+<li class="flex items-center justify-between gap-3 border-b border-black/5 px-5 py-3 last:border-b-0">
+  <%= link_to edit_kaikei_transaction_path(transaction), class: "flex flex-1 items-center gap-3 min-w-0" do %>
+    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold <%= transaction.type == "income" ? "bg-kaikei-income/10 text-kaikei-income" : "bg-kaikei-expense/10 text-kaikei-expense" %>">
+      <%= transaction.category.name.first %>
+    </span>
+    <div class="min-w-0">
+      <p class="truncate text-sm font-medium text-kaikei-text"><%= transaction.category.name %><%= " ・ #{transaction.client_name}" if transaction.client_name.present? %></p>
+      <p class="text-xs text-kaikei-text-subtle"><%= transaction.date.strftime("%-m月%-d日") %></p>
+    </div>
+  <% end %>
+  <div class="flex shrink-0 items-center gap-3">
+    <%= render "kaikei/shared/amount", amount: transaction.amount, positive: transaction.type == "income" %>
+    <%= button_to kaikei_transaction_path(transaction), method: :delete,
+          form: { data: { turbo_confirm: "この取引を削除しますか?" }, class: "leading-none" },
+          class: "flex h-8 w-8 items-center justify-center rounded-full text-kaikei-text-subtle hover:bg-kaikei-expense/10 hover:text-kaikei-expense" do %>
+      <i class="fa-solid fa-trash text-sm"></i>
+    <% end %>
+  </div>
+</li>

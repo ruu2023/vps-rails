@@ -14,7 +14,7 @@ class Kaikei::CategoriesController < Kaikei::BaseController
     @category.sort_order = current_user.kaikei_categories.maximum(:sort_order).to_i + 1
 
     if @category.save
-      redirect_to kaikei_categories_path, notice: "科目を作成しました"
+      redirect_to kaikei_settings_path(tab: "category"), notice: "科目を作成しました"
     else
       render :new, status: :unprocessable_entity
     end
@@ -25,7 +25,7 @@ class Kaikei::CategoriesController < Kaikei::BaseController
 
   def update
     if @category.update(category_params)
-      redirect_to kaikei_categories_path, notice: "科目を更新しました"
+      redirect_to kaikei_settings_path(tab: "category"), notice: "科目を更新しました"
     else
       render :edit, status: :unprocessable_entity
     end
@@ -36,7 +36,7 @@ class Kaikei::CategoriesController < Kaikei::BaseController
 
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_to kaikei_categories_path, notice: "科目を削除しました" }
+      format.html { redirect_to kaikei_settings_path(tab: "category"), notice: "科目を削除しました" }
     end
   end
 

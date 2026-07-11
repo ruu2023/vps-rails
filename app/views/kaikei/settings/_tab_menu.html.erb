@@ -1,0 +1,25 @@
+<%# locals: active_tab: %>
+<%
+  tabs = [
+    { key: "export", label: "データエクスポート", icon: "fa-file-export" },
+    { key: "category", label: "科目管理", icon: "fa-tags" },
+    { key: "payment_method", label: "相手方管理", icon: "fa-credit-card" },
+    { key: "profile", label: "プロフィール", icon: "fa-user" },
+    { key: "notifications", label: "通知設定", icon: "fa-bell" },
+    { key: "appearance", label: "外観設定", icon: "fa-palette" },
+    { key: "about", label: "このアプリについて", icon: "fa-circle-info" },
+  ]
+%>
+<section class="mx-4 mt-4 overflow-x-auto rounded-kaikei-card bg-white p-3 shadow-kaikei-section [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+  <div class="flex gap-2">
+    <% tabs.each do |tab| %>
+      <% is_active = active_tab == tab[:key] %>
+      <button type="button" data-tab="<%= tab[:key] %>" data-action="click->kaikei--settings#showTab"
+        data-kaikei--settings-target="tabButton"
+        class="flex w-24 shrink-0 flex-col items-center gap-2 rounded-kaikei-control px-3 py-3 text-xs font-medium <%= is_active ? "bg-kaikei-primary/10 text-kaikei-primary" : "text-kaikei-text-muted" %>">
+        <i class="fa-solid <%= tab[:icon] %> text-lg"></i>
+        <span class="text-center leading-tight"><%= tab[:label] %></span>
+      </button>
+    <% end %>
+  </div>
+</section>

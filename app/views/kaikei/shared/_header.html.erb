@@ -1,0 +1,15 @@
+<header class="sticky top-0 z-10 flex items-center justify-between bg-white px-4 py-4 shadow-kaikei-section">
+  <% if content_for?(:kaikei_header) %>
+    <%= yield :kaikei_header %>
+  <% else %>
+    <h1 class="text-xl font-semibold text-kaikei-text">会計管理</h1>
+    <div class="flex items-center gap-2">
+      <span class="flex h-9 w-9 items-center justify-center rounded-full bg-kaikei-bg text-kaikei-text">
+        <i class="fa-regular fa-bell"></i>
+      </span>
+      <%= button_to logout_path, method: :delete, title: "ログアウト", form: { class: "contents" }, class: "flex h-9 w-9 items-center justify-center rounded-full bg-kaikei-bg text-kaikei-text" do %>
+        <i class="fa-regular fa-circle-user"></i>
+      <% end %>
+    </div>
+  <% end %>
+</header>

@@ -1,0 +1,51 @@
+<% input_class = "w-full rounded-kaikei-control bg-kaikei-bg px-4 py-3 text-kaikei-text focus:outline-none focus:ring-2 focus:ring-kaikei-primary/20" %>
+
+<div data-kaikei--settings-target="categoryModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-kaikei-overlay p-4" hidden>
+  <div class="w-full max-w-[500px] rounded-kaikei-card bg-white p-5 shadow-kaikei-section">
+    <div class="flex items-center justify-between">
+      <h3 data-kaikei--settings-target="categoryModalTitle" class="text-lg font-semibold text-kaikei-text">科目を追加</h3>
+      <button type="button" data-action="click->kaikei--settings#closeCategoryModal" class="flex h-8 w-8 items-center justify-center rounded-full text-kaikei-text-muted">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <%= form_with url: kaikei_categories_path, method: :post, scope: :kaikei_category, local: true,
+          data: { kaikei__settings_target: "categoryForm" }, class: "mt-4 space-y-4" do |f| %>
+      <%= hidden_field_tag :_method, "post", data: { kaikei__settings_target: "categoryMethodField" } %>
+
+      <div>
+        <%= f.label :name, "科目名", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+        <%= f.text_field :name, required: true, data: { kaikei__settings_target: "categoryNameField" }, class: input_class %>
+      </div>
+
+      <div>
+        <%= f.label :default_type, "収支区分", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+        <%= f.select :default_type, [ [ "収入", "income" ], [ "支出", "expense" ] ], {},
+              data: { kaikei__settings_target: "categoryTypeField" }, class: input_class %>
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-medium text-kaikei-text">アイコン</label>
+        <div class="mb-3 flex items-center gap-3">
+          <span class="flex h-12 w-12 items-center justify-center rounded-full bg-kaikei-bg text-kaikei-text">
+            <i data-kaikei--settings-target="categoryIconPreview" class="fa-solid fa-coins text-lg"></i>
+          </span>
+        </div>
+        <div class="grid grid-cols-6 gap-2">
+          <% Kaikei::Category::ICONS.each do |icon| %>
+            <button type="button" data-icon="<%= icon %>" data-action="click->kaikei--settings#selectIcon"
+              data-kaikei--settings-target="iconOption"
+              class="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 text-kaikei-text-muted hover:bg-kaikei-bg">
+              <i class="fa-solid <%= icon %> text-sm"></i>
+            </button>
+          <% end %>
+        </div>
+        <%= f.hidden_field :icon, value: "fa-coins", data: { kaikei__settings_target: "categoryIconField" } %>
+      </div>
+
+      <%= f.button type: "submit", class: "w-full cursor-pointer rounded-kaikei-control bg-kaikei-primary py-3 font-semibold text-white hover:opacity-90" do %>
+        保存
+      <% end %>
+    <% end %>
+  </div>
+</div>

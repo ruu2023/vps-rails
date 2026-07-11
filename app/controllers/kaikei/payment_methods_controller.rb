@@ -13,7 +13,7 @@ class Kaikei::PaymentMethodsController < Kaikei::BaseController
     @payment_method = current_user.kaikei_payment_methods.build(payment_method_params)
 
     if @payment_method.save
-      redirect_to kaikei_payment_methods_path, notice: "支払方法を作成しました"
+      redirect_to kaikei_settings_path(tab: "payment_method"), notice: "支払方法を作成しました"
     else
       render :new, status: :unprocessable_entity
     end
@@ -24,7 +24,7 @@ class Kaikei::PaymentMethodsController < Kaikei::BaseController
 
   def update
     if @payment_method.update(payment_method_params)
-      redirect_to kaikei_payment_methods_path, notice: "支払方法を更新しました"
+      redirect_to kaikei_settings_path(tab: "payment_method"), notice: "支払方法を更新しました"
     else
       render :edit, status: :unprocessable_entity
     end

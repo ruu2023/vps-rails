@@ -20,7 +20,7 @@ class Kaikei::CategoriesControllerTest < ActionDispatch::IntegrationTest
     assert_difference -> { users(:alice).kaikei_categories.count }, 1 do
       post kaikei_categories_path, params: { kaikei_category: { name: "交通費", default_type: "expense" } }
     end
-    assert_redirected_to kaikei_categories_path
+    assert_redirected_to kaikei_settings_path(tab: "category")
   end
 
   test "cannot edit another user's category" do
@@ -31,7 +31,7 @@ class Kaikei::CategoriesControllerTest < ActionDispatch::IntegrationTest
   test "destroy soft-deletes the category" do
     category = kaikei_categories(:alice_food)
     delete kaikei_category_path(category)
-    assert_redirected_to kaikei_categories_path
+    assert_redirected_to kaikei_settings_path(tab: "category")
     assert category.reload.discarded?
   end
 

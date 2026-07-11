@@ -1,0 +1,14 @@
+<div data-kaikei--settings-target="deleteCategoryModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-kaikei-overlay p-4" hidden>
+  <div class="w-full max-w-[400px] rounded-kaikei-card bg-white p-6 text-center shadow-kaikei-section">
+    <p class="text-kaikei-text">この科目を削除しますか?</p>
+    <div class="mt-5 flex gap-3">
+      <button type="button" data-action="click->kaikei--settings#closeDeleteCategoryModal"
+        class="flex-1 cursor-pointer rounded-kaikei-control bg-kaikei-bg py-3 font-semibold text-kaikei-text">
+        キャンセル
+      </button>
+      <%= button_to "削除", "#", method: :delete,
+            form: { data: { kaikei__settings_target: "categoryDeleteForm", turbo: false }, class: "flex-1" },
+            class: "w-full cursor-pointer rounded-kaikei-control bg-kaikei-expense py-3 font-semibold text-white hover:opacity-90" %>
+    </div>
+  </div>
+</div>

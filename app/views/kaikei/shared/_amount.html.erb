@@ -1,0 +1,10 @@
+<%# locals: amount:, positive:, variant: :default %>
+<%
+  variant ||= :default
+  color_class = if variant == :balance
+    positive ? "text-kaikei-balance-positive" : "text-kaikei-balance-negative"
+  else
+    positive ? "text-kaikei-income" : "text-kaikei-expense"
+  end
+%>
+<span class="font-semibold <%= color_class %>"><%= positive ? "+" : "-" %>&yen;<%= number_with_delimiter(amount.abs) %></span>

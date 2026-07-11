@@ -1,0 +1,4 @@
+<%# locals: category: %>
+<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full <%= category.default_type == "income" ? "bg-kaikei-income/10 text-kaikei-income" : "bg-kaikei-expense/10 text-kaikei-expense" %>">
+  <i class="fa-solid <%= category.icon.presence || "fa-coins" %>"></i>
+</span>

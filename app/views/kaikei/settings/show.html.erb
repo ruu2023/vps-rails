@@ -1,0 +1,45 @@
+<% content_for :kaikei_header do %>
+  <h1 class="text-xl font-semibold text-kaikei-text">設定</h1>
+  <button type="button" data-action="click->kaikei--settings#help"
+    class="flex h-9 w-9 items-center justify-center rounded-full bg-kaikei-bg text-kaikei-text-muted">
+    <i class="fa-regular fa-circle-question"></i>
+  </button>
+<% end %>
+
+<div data-controller="kaikei--settings"
+  data-kaikei--settings-categories-path-value="<%= kaikei_categories_path %>"
+  data-kaikei--settings-active-tab-value="<%= @tab %>">
+
+  <%= render "tab_menu", active_tab: @tab %>
+
+  <div data-kaikei--settings-target="panel" data-tab="export" hidden>
+    <%= render "export_tab" %>
+  </div>
+
+  <div data-kaikei--settings-target="panel" data-tab="category" hidden>
+    <%= render "category_tab" %>
+  </div>
+
+  <div data-kaikei--settings-target="panel" data-tab="payment_method" hidden>
+    <%= render "payment_method_tab" %>
+  </div>
+
+  <div data-kaikei--settings-target="panel" data-tab="profile" hidden>
+    <%= render "placeholder_tab", icon: "fa-user", label: "プロフィール" %>
+  </div>
+
+  <div data-kaikei--settings-target="panel" data-tab="notifications" hidden>
+    <%= render "placeholder_tab", icon: "fa-bell", label: "通知設定" %>
+  </div>
+
+  <div data-kaikei--settings-target="panel" data-tab="appearance" hidden>
+    <%= render "placeholder_tab", icon: "fa-palette", label: "外観設定" %>
+  </div>
+
+  <div data-kaikei--settings-target="panel" data-tab="about" hidden>
+    <%= render "about_tab" %>
+  </div>
+
+  <%= render "category_modal" %>
+  <%= render "delete_category_modal" %>
+</div>
