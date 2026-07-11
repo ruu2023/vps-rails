@@ -5,7 +5,7 @@
 <section class="mx-4 mt-4 rounded-kaikei-card bg-white p-5 shadow-kaikei-section">
   <h3 class="text-base font-semibold text-kaikei-text">新しい相手方を追加</h3>
 
-  <%= form_with model: @new_payment_method, scope: :kaikei_payment_method, url: kaikei_payment_methods_path, local: true, class: "mt-4 space-y-4" do |f| %>
+  <%= form_with model: new_payment_method, scope: :kaikei_payment_method, url: kaikei_payment_methods_path, local: true, class: "mt-4 space-y-4" do |f| %>
     <div>
       <%= f.label :name, "相手方名", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
       <%= f.text_field :name, placeholder: "例: 現金、クレジットカードA", class: input_class %>
