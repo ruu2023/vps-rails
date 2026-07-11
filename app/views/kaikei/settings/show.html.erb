@@ -13,15 +13,15 @@
   <%= render "tab_menu", active_tab: @tab %>
 
   <div data-kaikei--settings-target="panel" data-tab="export" hidden>
-    <%= render "export_tab" %>
+    <%= render "export_tab", export_start_date: @export_start_date, export_end_date: @export_end_date %>
   </div>
 
   <div data-kaikei--settings-target="panel" data-tab="category" hidden>
-    <%= render "category_tab" %>
+    <%= render "category_tab", income_categories: @income_categories %>
   </div>
 
   <div data-kaikei--settings-target="panel" data-tab="payment_method" hidden>
-    <%= render "payment_method_tab", new_payment_method: @new_payment_method %>
+    <%= render "payment_method_tab", new_payment_method: @new_payment_method, income_payment_methods: @income_payment_methods, expense_payment_methods: @expense_payment_methods %>
   </div>
 
   <div data-kaikei--settings-target="panel" data-tab="profile" hidden>

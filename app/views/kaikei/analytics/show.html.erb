@@ -15,11 +15,11 @@
 
 <section class="mx-4 mt-4 overflow-hidden rounded-kaikei-card bg-white shadow-kaikei-card">
   <%= render "summary_card", icon: "fa-arrow-down", icon_bg_class: "bg-kaikei-income/10", icon_color_class: "text-kaikei-income",
-        label: "収入", amount_html: "&yen;#{number_with_delimiter(@income_total)}".html_safe %>
+        label: "収入", amount: "¥#{number_with_delimiter(@income_total)}" %>
   <%= render "summary_card", icon: "fa-arrow-up", icon_bg_class: "bg-kaikei-expense/10", icon_color_class: "text-kaikei-expense",
-        label: "支出", amount_html: "&yen;#{number_with_delimiter(@expense_total)}".html_safe %>
+        label: "支出", amount: "¥#{number_with_delimiter(@expense_total)}" %>
   <%= render "summary_card", icon: "fa-coins", icon_bg_class: "bg-kaikei-primary/10", icon_color_class: "text-kaikei-primary",
-        label: "収支", amount_html: "#{@balance >= 0 ? "+" : "-"}&yen;#{number_with_delimiter(@balance.abs)}".html_safe %>
+        label: "収支", amount: "#{@balance >= 0 ? "+" : "-"}¥#{number_with_delimiter(@balance.abs)}" %>
 </section>
 
 <section class="mx-4 mt-4 rounded-kaikei-card bg-white p-5 shadow-kaikei-section"
