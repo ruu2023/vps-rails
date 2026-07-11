@@ -1,0 +1,5 @@
+<% if @budget.previously_new_record? %>
+  <%= turbo_stream.append "budgets", @budget %>
+<% else %>
+  <%= turbo_stream.replace @budget %>
+<% end %>

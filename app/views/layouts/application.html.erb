@@ -24,6 +24,24 @@
   </head>
 
   <body>
-    <%= yield %>
+    <% if logged_in? %>
+      <nav>
+        <%= link_to "ダッシュボード", kaikei_dashboard_path %>
+        <%= link_to "取引", kaikei_transactions_path %>
+        <%= link_to "科目", kaikei_categories_path %>
+        <%= link_to "支払方法", kaikei_payment_methods_path %>
+        <%= link_to "予算", kaikei_budgets_path %>
+        <%= link_to "エクスポート", new_kaikei_exports_path %>
+        <%= button_to "ログアウト", logout_path, method: :delete %>
+      </nav>
+    <% end %>
+
+    <% flash.each do |type, message| %>
+      <p class="flash flash-<%= type %>"><%= message %></p>
+    <% end %>
+
+    <main>
+      <%= yield %>
+    </main>
   </body>
 </html>

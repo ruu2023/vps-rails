@@ -1,0 +1,16 @@
+<h1>科目</h1>
+
+<%= link_to "新規作成", new_kaikei_category_path %>
+
+<table>
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>収支区分</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="categories">
+    <%= render @categories %>
+  </tbody>
+</table>

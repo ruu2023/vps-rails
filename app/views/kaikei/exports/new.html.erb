@@ -1,0 +1,21 @@
+<h1>エクスポート</h1>
+
+<%= form_with url: kaikei_exports_path, local: true do |f| %>
+  <div>
+    <%= f.label :start_date, "開始日" %>
+    <%= f.date_field :start_date %>
+  </div>
+  <div>
+    <%= f.label :end_date, "終了日" %>
+    <%= f.date_field :end_date %>
+  </div>
+  <div>
+    <%= f.label :kind, "出力項目" %>
+    <%= f.select :kind, [ [ "取引データ", "transactions" ], [ "仕訳帳", "journal" ] ] %>
+  </div>
+  <div>
+    <%= f.label :format, "形式" %>
+    <%= f.select :format, [ [ "CSV", "csv" ], [ "Excel", "excel" ] ] %>
+  </div>
+  <%= f.submit "ダウンロード" %>
+<% end %>

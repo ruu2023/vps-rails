@@ -1,0 +1,19 @@
+_fixture:
+  model_class: Kaikei::Transaction
+
+alice_lunch:
+  user: alice
+  category: alice_food
+  payment_method: alice_cash
+  date: <%= Date.current.to_s %>
+  amount: 1200
+  type: expense
+  memo: ランチ
+
+alice_pay:
+  user: alice
+  category: alice_salary
+  payment_method: alice_bank
+  date: <%= Date.current.to_s %>
+  amount: 300000
+  type: income

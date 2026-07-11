@@ -1,0 +1,21 @@
+<%= form_with model: payment_method, scope: :kaikei_payment_method, url: url, local: true do |f| %>
+  <% if payment_method.errors.any? %>
+    <ul>
+      <% payment_method.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "名前" %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :type, "収支区分" %>
+    <%= f.select :type, [ [ "収入", "income" ], [ "支出", "expense" ] ] %>
+  </div>
+
+  <%= f.submit "保存" %>
+<% end %>

@@ -1,0 +1,25 @@
+<h1>支払方法</h1>
+
+<%= link_to "新規作成", new_kaikei_payment_method_path %>
+
+<table>
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>収支区分</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @payment_methods.each do |payment_method| %>
+      <tr>
+        <td><%= payment_method.name %></td>
+        <td><%= payment_method.type == "income" ? "収入" : "支出" %></td>
+        <td>
+          <%= link_to "編集", edit_kaikei_payment_method_path(payment_method) %>
+          <%= button_to "削除", kaikei_payment_method_path(payment_method), method: :delete, form: { data: { turbo_confirm: "削除しますか?" } } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

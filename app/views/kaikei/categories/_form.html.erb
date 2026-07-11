@@ -1,0 +1,26 @@
+<%= form_with model: category, scope: :kaikei_category, url: url, local: true do |f| %>
+  <% if category.errors.any? %>
+    <ul>
+      <% category.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "名前" %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :icon, "アイコン" %>
+    <%= f.text_field :icon %>
+  </div>
+
+  <div>
+    <%= f.label :default_type, "収支区分" %>
+    <%= f.select :default_type, [ [ "収入", "income" ], [ "支出", "expense" ] ] %>
+  </div>
+
+  <%= f.submit "保存" %>
+<% end %>

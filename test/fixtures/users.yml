@@ -1,0 +1,11 @@
+alice:
+  email: alice@example.com
+  name: Alice
+  provider: google_oauth2
+  uid: "1001"
+
+bob:
+  email: bob@example.com
+  name: Bob
+  provider: google_oauth2
+  uid: "1002"

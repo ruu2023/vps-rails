@@ -1,0 +1,32 @@
+<h1>予算(<%= @year %>年<%= @month %>月)</h1>
+
+<%= form_with url: kaikei_budgets_path, method: :get, local: true do |f| %>
+  <%= f.number_field :year, value: @year %>
+  <%= f.number_field :month, value: @month, min: 1, max: 12 %>
+  <%= f.submit "表示" %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>科目</th>
+      <th>予算額</th>
+      <th>実績</th>
+      <th>使用率</th>
+      <th>状態</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="budgets">
+    <%= render @budgets %>
+  </tbody>
+</table>
+
+<h2>予算を設定</h2>
+<%= form_with url: kaikei_budgets_path, scope: :kaikei_budget, local: true do |f| %>
+  <%= f.hidden_field :year, value: @year %>
+  <%= f.hidden_field :month, value: @month %>
+  <%= f.collection_select :category_id, @expense_categories, :id, :name %>
+  <%= f.number_field :amount, min: 1 %>
+  <%= f.submit "保存" %>
+<% end %>

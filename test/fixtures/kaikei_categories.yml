@@ -1,0 +1,20 @@
+_fixture:
+  model_class: Kaikei::Category
+
+alice_salary:
+  user: alice
+  name: 給与
+  default_type: income
+  sort_order: 1
+
+alice_food:
+  user: alice
+  name: 食費
+  default_type: expense
+  sort_order: 2
+
+bob_food:
+  user: bob
+  name: 食費
+  default_type: expense
+  sort_order: 1

@@ -1,0 +1,9 @@
+_fixture:
+  model_class: Kaikei::Budget
+
+alice_food_budget:
+  user: alice
+  category: alice_food
+  amount: 30000
+  year: <%= Date.current.year %>
+  month: <%= Date.current.month %>

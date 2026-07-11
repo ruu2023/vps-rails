@@ -1,0 +1,50 @@
+<h1>取引一覧</h1>
+
+<%= link_to "新規登録", new_kaikei_transaction_path %>
+
+<%= form_with url: kaikei_transactions_path, method: :get, local: true do |f| %>
+  <%= f.select :type, [ [ "すべて", "" ], [ "収入", "income" ], [ "支出", "expense" ] ], selected: params[:type] %>
+  <%= f.collection_select :category_id, @categories, :id, :name, { include_blank: "すべての科目", selected: params[:category_id] } %>
+  <%= f.date_field :start_date, value: params[:start_date] %>
+  <%= f.date_field :end_date, value: params[:end_date] %>
+  <%= f.submit "絞り込み" %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>日付</th>
+      <th>科目</th>
+      <th>支払方法</th>
+      <th>取引先</th>
+      <th>収支区分</th>
+      <th>金額</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @transactions.each do |transaction| %>
+      <tr>
+        <td><%= transaction.date %></td>
+        <td><%= transaction.category.name %></td>
+        <td><%= transaction.payment_method&.name %></td>
+        <td><%= transaction.client_name %></td>
+        <td><%= transaction.type == "income" ? "収入" : "支出" %></td>
+        <td><%= number_with_delimiter(transaction.amount) %></td>
+        <td>
+          <%= link_to "編集", edit_kaikei_transaction_path(transaction) %>
+          <%= button_to "削除", kaikei_transaction_path(transaction), method: :delete, form: { data: { turbo_confirm: "削除しますか?" } } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div>
+  <% if @page > 1 %>
+    <%= link_to "前へ", kaikei_transactions_path(request.query_parameters.merge(page: @page - 1)) %>
+  <% end %>
+  <% if @page * Kaikei::TransactionsController::PER_PAGE < @total_count %>
+    <%= link_to "次へ", kaikei_transactions_path(request.query_parameters.merge(page: @page + 1)) %>
+  <% end %>
+</div>

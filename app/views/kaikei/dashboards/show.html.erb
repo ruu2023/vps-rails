@@ -1,0 +1,42 @@
+<h1>ダッシュボード</h1>
+
+<section>
+  <p>今月の収入: <%= number_with_delimiter(@current_income) %></p>
+  <p>今月の支出: <%= number_with_delimiter(@current_expense) %></p>
+  <p>
+    今月の収支: <%= @current_balance >= 0 ? "+" : "" %><%= number_with_delimiter(@current_balance) %>
+    (前月比 <%= @balance_change_rate %>%)
+  </p>
+</section>
+
+<section>
+  <h2>直近の取引</h2>
+  <ul>
+    <% @recent_transactions.each do |transaction| %>
+      <li><%= transaction.date %> - <%= transaction.category.name %> - <%= number_with_delimiter(transaction.amount) %></li>
+    <% end %>
+  </ul>
+</section>
+
+<section>
+  <h2>過去6ヶ月の推移</h2>
+  <canvas
+    data-controller="kaikei--chart"
+    data-kaikei--chart-labels-value="<%= @monthly_series.map { |m| m[:label] }.to_json %>"
+    data-kaikei--chart-income-value="<%= @monthly_series.map { |m| m[:income] }.to_json %>"
+    data-kaikei--chart-expense-value="<%= @monthly_series.map { |m| m[:expense] }.to_json %>"
+  ></canvas>
+</section>
+
+<section>
+  <h2>今月の予算</h2>
+  <ul>
+    <% @budgets.each do |budget| %>
+      <li>
+        <%= budget.category.name %>:
+        <%= number_with_delimiter(budget.actual_spent) %> / <%= number_with_delimiter(budget.amount) %>
+        (<%= budget.progress_percentage %>%, <%= budget.warning_level %>)
+      </li>
+    <% end %>
+  </ul>
+</section>

@@ -1,0 +1,10 @@
+<tr id="<%= dom_id(budget) %>">
+  <td><%= budget.category.name %></td>
+  <td><%= number_with_delimiter(budget.amount) %></td>
+  <td><%= number_with_delimiter(budget.actual_spent) %></td>
+  <td><%= budget.progress_percentage %>%</td>
+  <td><%= budget.warning_level %></td>
+  <td>
+    <%= button_to "削除", kaikei_budget_path(budget), method: :delete, form: { data: { turbo_confirm: "削除しますか?" } } %>
+  </td>
+</tr>

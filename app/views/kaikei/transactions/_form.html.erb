@@ -1,0 +1,54 @@
+<%= form_with model: transaction, scope: :kaikei_transaction, url: url, local: true,
+      data: { controller: "kaikei--transaction-form" } do |f| %>
+  <% if transaction.errors.any? %>
+    <ul>
+      <% transaction.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div>
+    <%= f.label :date, "日付" %>
+    <%= f.date_field :date %>
+  </div>
+
+  <div>
+    <%= f.label :category_id, "科目" %>
+    <%= f.select :category_id,
+          options_for_select(
+            @categories.map { |c| [ c.name, c.id, { data: { default_type: c.default_type } } ] },
+            transaction.category_id
+          ),
+          { include_blank: true },
+          data: { "kaikei--transaction-form-target": "category", action: "change->kaikei--transaction-form#syncType" } %>
+  </div>
+
+  <div>
+    <%= f.label :type, "収支区分" %>
+    <%= f.select :type, [ [ "収入", "income" ], [ "支出", "expense" ] ],
+          {}, data: { "kaikei--transaction-form-target": "type" } %>
+  </div>
+
+  <div>
+    <%= f.label :payment_method_id, "支払方法" %>
+    <%= f.collection_select :payment_method_id, @payment_methods, :id, :name, include_blank: true %>
+  </div>
+
+  <div>
+    <%= f.label :client_name, "取引先" %>
+    <%= f.text_field :client_name %>
+  </div>
+
+  <div>
+    <%= f.label :amount, "金額" %>
+    <%= f.number_field :amount, min: 0 %>
+  </div>
+
+  <div>
+    <%= f.label :memo, "メモ" %>
+    <%= f.text_area :memo %>
+  </div>
+
+  <%= f.submit "保存" %>
+<% end %>

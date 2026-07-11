@@ -1,0 +1,12 @@
+_fixture:
+  model_class: Kaikei::PaymentMethod
+
+alice_cash:
+  user: alice
+  name: 現金
+  type: expense
+
+alice_bank:
+  user: alice
+  name: 銀行振込
+  type: income
