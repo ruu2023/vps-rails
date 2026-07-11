@@ -27,10 +27,6 @@
   </head>
 
   <body>
-    <% flash.each do |type, message| %>
-      <p class="flash flash-<%= type %>"><%= message %></p>
-    <% end %>
-
     <%= content_for?(:content_for_layout) ? yield(:content_for_layout) : yield %>
   </body>
 </html>

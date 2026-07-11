@@ -1,9 +1,7 @@
 <%# locals: transaction: %>
 <li class="flex items-center justify-between gap-3 border-b border-black/5 px-5 py-3 last:border-b-0">
   <div class="flex items-center gap-3">
-    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold <%= transaction.type == "income" ? "bg-kaikei-income/10 text-kaikei-income" : "bg-kaikei-expense/10 text-kaikei-expense" %>">
-      <%= transaction.category.name.first %>
-    </span>
+    <%= render "kaikei/shared/category_icon", category: transaction.category %>
     <div>
       <p class="text-sm font-medium text-kaikei-text"><%= transaction.category.name %></p>
       <p class="text-xs text-kaikei-text-subtle"><%= transaction.date.strftime("%-m月%-d日") %></p>

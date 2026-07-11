@@ -1,9 +1,9 @@
 class Kaikei::PaymentMethodsController < Kaikei::BaseController
   before_action :set_payment_method, only: [ :edit, :update, :destroy ]
 
-  def index
-    @payment_methods = current_user.kaikei_payment_methods.order(:name)
-  end
+  # def index
+  #   @payment_methods = current_user.kaikei_payment_methods.order(:name)
+  # end
 
   def new
     @payment_method = current_user.kaikei_payment_methods.build
@@ -13,7 +13,7 @@ class Kaikei::PaymentMethodsController < Kaikei::BaseController
     @payment_method = current_user.kaikei_payment_methods.build(payment_method_params)
 
     if @payment_method.save
-      redirect_to kaikei_settings_path(tab: "payment_method"), notice: "支払方法を作成しました"
+      redirect_to kaikei_settings_path(tab: "payment_method"), notice: "相手方を作成しました"
     else
       render :new, status: :unprocessable_entity
     end
@@ -24,15 +24,15 @@ class Kaikei::PaymentMethodsController < Kaikei::BaseController
 
   def update
     if @payment_method.update(payment_method_params)
-      redirect_to kaikei_settings_path(tab: "payment_method"), notice: "支払方法を更新しました"
+      redirect_to kaikei_settings_path(tab: "payment_method"), notice: "相手方を更新しました"
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @payment_method.destroy
-    redirect_to kaikei_payment_methods_path, notice: "支払方法を削除しました"
+    @payment_method.discard
+    redirect_to kaikei_settings_path(tab: "payment_method"), notice: "相手方を削除しました"
   end
 
   private

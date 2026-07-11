@@ -1,3 +1,4 @@
+<% if false %>
 <h1>取引一覧</h1>
 
 <%= link_to "新規登録", new_kaikei_transaction_path %>
@@ -48,3 +49,4 @@
     <%= link_to "次へ", kaikei_transactions_path(request.query_parameters.merge(page: @page + 1)) %>
   <% end %>
 </div>
+<% end %>

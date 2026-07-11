@@ -7,6 +7,17 @@
   end
 %>
 <% content_for :content_for_layout do %>
+  <div class="pointer-events-none fixed inset-x-0 top-4 z-30 flex justify-center px-4">
+    <div class="flex w-full max-w-[480px] flex-col items-end gap-2">
+      <% flash.each do |type, message| %>
+        <div data-controller="kaikei--toast"
+             class="pointer-events-auto flex items-center gap-2 rounded-kaikei-card px-4 py-3 text-sm font-medium text-white shadow-kaikei-section transition-opacity duration-300 <%= type == "alert" ? "bg-kaikei-expense" : "bg-kaikei-primary" %>">
+          <%= message %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
   <div class="mx-auto min-h-screen max-w-[480px] bg-kaikei-bg pb-4">
     <%= render "kaikei/shared/header" %>
     <main>

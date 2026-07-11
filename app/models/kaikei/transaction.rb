@@ -5,8 +5,8 @@ class Kaikei::Transaction < ApplicationRecord
   TYPES = %w[income expense].freeze
 
   belongs_to :user
-  belongs_to :category, class_name: "Kaikei::Category"
-  belongs_to :payment_method, class_name: "Kaikei::PaymentMethod", optional: true
+  belongs_to :category, -> { unscope(where: :deleted_at) }, class_name: "Kaikei::Category"
+  belongs_to :payment_method, -> { unscope(where: :deleted_at) }, class_name: "Kaikei::PaymentMethod", optional: true
 
   validates :date, presence: true
   validates :amount, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }

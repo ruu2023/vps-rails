@@ -1,9 +1,9 @@
 class Kaikei::CategoriesController < Kaikei::BaseController
   before_action :set_category, only: [ :edit, :update, :destroy ]
 
-  def index
-    @categories = current_user.kaikei_categories.order(:sort_order)
-  end
+  # def index
+  #   @categories = current_user.kaikei_categories.order(:sort_order)
+  # end
 
   def new
     @category = current_user.kaikei_categories.build

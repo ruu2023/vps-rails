@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_10_145205) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_11_102353) do
   create_table "kaikei_budgets", force: :cascade do |t|
     t.integer "amount", null: false
     t.integer "category_id", null: false
@@ -42,10 +42,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_10_145205) do
 
   create_table "kaikei_payment_methods", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.datetime "deleted_at"
     t.string "name", null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["deleted_at"], name: "index_kaikei_payment_methods_on_deleted_at"
     t.index ["user_id"], name: "index_kaikei_payment_methods_on_user_id"
     t.check_constraint "type IN ('income', 'expense')", name: "kaikei_payment_methods_type_check"
   end
@@ -84,6 +86,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_10_145205) do
   add_foreign_key "kaikei_categories", "users"
   add_foreign_key "kaikei_payment_methods", "users"
   add_foreign_key "kaikei_transactions", "kaikei_categories", column: "category_id"
-  add_foreign_key "kaikei_transactions", "kaikei_payment_methods", column: "payment_method_id", on_delete: :nullify
+  add_foreign_key "kaikei_transactions", "kaikei_payment_methods", column: "payment_method_id"
   add_foreign_key "kaikei_transactions", "users"
 end

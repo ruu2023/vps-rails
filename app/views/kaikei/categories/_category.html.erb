@@ -1,3 +1,4 @@
+<% if false %>
 <tr id="<%= dom_id(category) %>">
   <td><%= category.name %></td>
   <td><%= category.default_type == "income" ? "収入" : "支出" %></td>
@@ -6,3 +7,4 @@
     <%= button_to "削除", kaikei_category_path(category), method: :delete, form: { data: { turbo_confirm: "削除しますか?" } } %>
   </td>
 </tr>
+<% end %>

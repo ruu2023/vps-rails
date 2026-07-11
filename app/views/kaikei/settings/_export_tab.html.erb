@@ -2,7 +2,7 @@
 
 <h2 class="mx-4 mt-4 text-lg font-semibold text-kaikei-text">データエクスポート</h2>
 
-<%= form_with url: kaikei_exports_path, method: :post, local: true, class: "contents" do |f| %>
+<%= form_with url: kaikei_exports_path, method: :post, local: true, data: { turbo: false }, class: "contents" do |f| %>
   <section class="mx-4 mt-4 rounded-kaikei-card bg-white p-5 shadow-kaikei-section">
     <h3 class="text-sm font-semibold text-kaikei-text">期間を選択</h3>
     <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">

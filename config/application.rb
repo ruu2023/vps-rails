@@ -11,6 +11,13 @@ module VpsRails
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
+    # kaikei の設定画面モーダル(科目編集/削除)は JS で <form> の action を
+    # 動的に書き換えるため、Rails 8 デフォルトの per-form CSRF トークン
+    # (action/method ごとにスコープされる)だと検証に失敗する。個人利用の
+    # 非公開アプリのため、セッションベースの CSRF 保護は維持したまま
+    # per-form スコープのみ無効化する。
+    config.action_controller.per_form_csrf_tokens = false
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

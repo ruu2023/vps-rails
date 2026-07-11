@@ -52,13 +52,13 @@
     </div>
 
     <div>
-      <%= f.label :payment_method_id, "支払方法", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
+      <%= f.label :payment_method_id, "相手方", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
       <%= f.select :payment_method_id,
             options_for_select(
               @payment_methods.map { |pm| [ pm.name, pm.id, { data: { type: pm.type } } ] },
               transaction.payment_method_id
             ),
-            { include_blank: "支払方法を選択してください" },
+            { include_blank: "相手方を選択してください" },
             data: { "kaikei--transaction-form-target": "paymentMethod" },
             class: input_class %>
     </div>
