@@ -38,6 +38,21 @@ module.exports = {
         'kaikei-section': '0 2px 4px rgba(0, 0, 0, 0.05)',
         'kaikei-card': '0 2px 4px rgba(0, 0, 0, 0.1)',
       },
+      // reservation（予約カレンダー）モーダル開閉アニメーション: docs/spec/reservation/front-detail.md 2.1
+      keyframes: {
+        reservationBackdropIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        reservationModalIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95) translateY(4px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
+      },
+      animation: {
+        'reservation-backdrop-in': 'reservationBackdropIn 0.15s ease-out',
+        'reservation-modal-in': 'reservationModalIn 0.18s ease-out',
+      },
     },
   },
   plugins: [

@@ -1,43 +1,96 @@
-<% input_class = "w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30" %>
-<% submit_label = local_assigns.fetch(:submit_label, "保存") %>
+<%
+  input_class = "w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+  close_path = reservation_events_path(start_date: event.start_time&.to_date)
+%>
 
-<%= form_with model: event, scope: :reservation_event, url: url, local: true,
-      data: { controller: "reservation--time-sync", turbo_frame: "_top" }, class: "space-y-4" do |f| %>
-  <% if event.errors.any? %>
-    <ul class="space-y-1 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-      <% event.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
+<%= turbo_frame_tag "modal" do %>
+  <div class="animate-reservation-backdrop-in fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4">
+    <div class="animate-reservation-modal-in flex max-h-[90vh] w-full max-w-md flex-col rounded-xl bg-white shadow-xl">
+      <div class="flex items-center justify-between rounded-t-xl border-b border-gray-200 bg-gray-50 px-5 py-4">
+        <h2 class="text-lg font-bold text-gray-900"><%= title %></h2>
+        <%= link_to close_path, data: { turbo_frame: "modal" }, class: "text-gray-400 hover:text-gray-600" do %>
+          <i class="fa-solid fa-xmark text-xl"></i>
+        <% end %>
+      </div>
+
+      <%= form_with model: event, scope: :reservation_event, url: url, id: "reservation-event-form",
+            class: "min-h-0 flex-1",
+            data: { controller: "reservation--time-sync", turbo_frame: "_top" } do |f| %>
+        <div class="h-full space-y-4 overflow-y-auto px-5 py-4">
+          <% if event.errors.any? %>
+            <div class="rounded-lg border border-pink-200 bg-pink-50 p-3 text-sm text-pink-600">
+              <%= event.errors.count %>箇所ほど、お直しが必要です ₍ᐢ‥ᐢ₎
+            </div>
+          <% end %>
+
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <%= f.label :title, "タイトル", class: "block text-sm font-medium text-gray-700" %>
+              <% if event.errors[:title].any? %>
+                <span class="text-xs text-pink-600"><%= event.errors[:title].first %></span>
+              <% end %>
+            </div>
+            <%= f.text_field :title, maxlength: 50, placeholder: "例：外乗、十勝など", class: input_class %>
+          </div>
+
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <%= f.label :start_time, "開始日時", class: "block text-sm font-medium text-gray-700" %>
+              <% if event.errors[:start_time].any? %>
+                <span class="text-xs text-pink-600"><%= event.errors[:start_time].first %></span>
+              <% end %>
+            </div>
+            <%= f.datetime_field :start_time, class: input_class,
+                  data: { "reservation--time-sync-target": "start", action: "change->reservation--time-sync#sync" } %>
+          </div>
+
+          <div>
+            <label class="inline-flex cursor-pointer items-center gap-2">
+              <%= f.check_box :has_end_time, class: "peer sr-only",
+                    data: { "reservation--time-sync-target": "toggle", action: "change->reservation--time-sync#toggleEnd" } %>
+              <span class="relative h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-blue-500">
+                <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition-transform peer-checked:translate-x-5"></span>
+              </span>
+              <span class="text-sm font-medium text-gray-700">終了日時を指定する</span>
+            </label>
+          </div>
+
+          <div data-reservation--time-sync-target="endWrapper" class="<%= "hidden" unless event.has_end_time? %>">
+            <% if event.errors[:end_time].any? %>
+              <p class="mb-1 text-xs text-pink-600"><%= event.errors[:end_time].first %></p>
+            <% end %>
+            <%= f.datetime_field :end_time, class: input_class, data: { "reservation--time-sync-target": "end" } %>
+          </div>
+
+          <div>
+            <%= f.label :content, "メモ", class: "mb-1 block text-sm font-medium text-gray-700" %>
+            <%= f.text_area :content, rows: 4, placeholder: "どんな予定ですか？", class: "#{input_class} resize-none" %>
+          </div>
+        </div>
       <% end %>
-    </ul>
-  <% end %>
 
-  <div>
-    <%= f.label :title, "タイトル", class: "mb-1 block text-sm font-medium text-gray-700" %>
-    <%= f.text_field :title, maxlength: 50, class: input_class %>
+      <div class="flex items-center justify-between rounded-b-xl border-t border-gray-200 px-5 py-4">
+        <% if show_delete %>
+          <%= button_to reservation_event_path(event), method: :delete,
+                class: "flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100",
+                form: { data: { turbo_confirm: "本当に削除しますか？", turbo_frame: "_top" } } do %>
+            <i class="fa-solid fa-trash"></i>
+          <% end %>
+        <% else %>
+          <div></div>
+        <% end %>
+
+        <div class="flex items-center gap-2">
+          <%= link_to close_path, data: { turbo_frame: "modal" },
+                class: "flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50" do %>
+            <i class="fa-solid fa-xmark"></i>
+          <% end %>
+          <%= tag.button form: "reservation-event-form", type: "submit",
+                class: "cursor-pointer rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white hover:opacity-90" do %>
+            <i class="fa-solid fa-check mr-1"></i>保存
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div>
-    <%= f.label :start_time, "開始時刻", class: "mb-1 block text-sm font-medium text-gray-700" %>
-    <%= f.datetime_field :start_time, class: input_class,
-          data: { "reservation--time-sync-target": "start", action: "change->reservation--time-sync#sync" } %>
-  </div>
-
-  <div>
-    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
-      <%= f.check_box :has_end_time %>
-      終了時刻を設定する
-    </label>
-  </div>
-
-  <div>
-    <%= f.label :end_time, "終了時刻", class: "mb-1 block text-sm font-medium text-gray-700" %>
-    <%= f.datetime_field :end_time, class: input_class, data: { "reservation--time-sync-target": "end" } %>
-  </div>
-
-  <div>
-    <%= f.label :content, "内容", class: "mb-1 block text-sm font-medium text-gray-700" %>
-    <%= f.text_area :content, rows: 4, class: input_class %>
-  </div>
-
-  <%= f.submit submit_label, class: "w-full cursor-pointer rounded-lg bg-blue-500 py-2 font-semibold text-white hover:opacity-90" %>
 <% end %>

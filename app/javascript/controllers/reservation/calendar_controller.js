@@ -8,22 +8,32 @@ const WEEKDAY_LABELS = [ "日", "月", "火", "水", "木", "金", "土" ]
 
 export default class extends Controller {
   static targets = [ "calendar", "events", "holidays", "modalLink" ]
+  static values = { startDate: String }
 
   connect() {
-    this.holidays = new Set(JSON.parse(this.holidaysTarget.textContent))
+    // { "2026-05-03": "憲法記念日", ... }
+    this.holidays = JSON.parse(this.holidaysTarget.textContent)
 
     this.calendar = new Calendar(this.calendarTarget, {
       plugins: [ dayGridPlugin, timeGridPlugin, interactionPlugin ],
       initialView: "dayGridMonth",
+      initialDate: this.startDateValue || undefined,
       firstDay: 0,
-      height: "auto",
+      height: "100%",
       events: this.pendingEvents ?? JSON.parse(this.eventsTarget.textContent),
+      eventDisplay: "block",
+      displayEventTime: false,
+      dayMaxEvents: true,
       buttonText: { today: "今日" },
       dayHeaderContent: (arg) => WEEKDAY_LABELS[arg.dow],
+      dayHeaderClassNames: (arg) => this.weekdayClassNames(arg.dow),
       dayCellClassNames: (arg) => this.dayCellClassNames(arg),
+      dayCellDidMount: (arg) => this.dayCellDidMount(arg),
+      datesSet: (arg) => this.updateTitle(arg),
       dateClick: (info) => this.openModal(`/reservation/events/new?date=${info.dateStr}`),
       eventClick: (info) => {
         info.jsEvent.preventDefault()
+        this.closePopoverIfNeeded(info.el)
         this.openModal(`/reservation/events/${info.event.id}/edit`)
       }
     })
@@ -57,10 +67,53 @@ export default class extends Controller {
     this.modalLinkTarget.click()
   }
 
-  dayCellClassNames(arg) {
-    if (this.holidays.has(this.formatLocalDate(arg.date)) || arg.dow === 0) return [ "text-red-500" ]
-    if (arg.dow === 6) return [ "text-blue-500" ]
+  // +N more のポップオーバー内からイベントを開く場合、遷移前に
+  // ポップオーバーを閉じておかないと開いたままモーダルの裏に残ってしまう。
+  closePopoverIfNeeded(el) {
+    if (!el.closest(".fc-popover")) return
+    document.querySelector(".fc-popover-close")?.click()
+  }
+
+  updateTitle(arg) {
+    const titleEl = this.calendarTarget.querySelector(".fc-toolbar-title")
+    if (!titleEl) return
+
+    const date = arg.view.currentStart
+    titleEl.innerHTML =
+      `<span class="reservation-calendar-title-month">${date.getMonth() + 1}月</span>` +
+      `<span class="reservation-calendar-title-year">${date.getFullYear()}</span>`
+  }
+
+  weekdayClassNames(dow) {
+    if (dow === 0) return [ "is-sunday" ]
+    if (dow === 6) return [ "is-saturday" ]
     return []
+  }
+
+  dayCellClassNames(arg) {
+    const classNames = []
+    const dow = arg.date.getDay()
+
+    if (this.holidays[this.formatLocalDate(arg.date)]) classNames.push("is-holiday")
+    else if (dow === 6) classNames.push("is-saturday")
+    else if (dow === 0) classNames.push("is-sunday")
+
+    if (arg.isToday) classNames.push("is-today")
+
+    return classNames
+  }
+
+  dayCellDidMount(arg) {
+    const holidayName = this.holidays[this.formatLocalDate(arg.date)]
+    if (!holidayName) return
+
+    const top = arg.el.querySelector(".fc-daygrid-day-top")
+    if (!top) return
+
+    const label = document.createElement("span")
+    label.className = "reservation-holiday-name"
+    label.textContent = holidayName
+    top.appendChild(label)
   }
 
   formatLocalDate(date) {

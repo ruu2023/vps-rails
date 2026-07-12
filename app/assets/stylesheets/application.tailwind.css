@@ -11,3 +11,91 @@
 }
 
 */
+
+/* reservation（予約カレンダー）: docs/spec/reservation/front-detail.md 準拠の FullCalendar 装飾。
+   FullCalendar が生成する DOM クラスへの上書きなので Tailwind ユーティリティでは表現できず、
+   .reservation-calendar でスコープした素の CSS を使う。 */
+.reservation-calendar .fc-toolbar.fc-header-toolbar {
+    margin: 0.5em;
+}
+
+.reservation-calendar .fc-toolbar-title {
+    display: flex;
+    align-items: baseline;
+}
+
+.reservation-calendar .reservation-calendar-title-month {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.reservation-calendar .reservation-calendar-title-year {
+    margin-left: 0.375rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.reservation-calendar .fc-today-button {
+    background-color: #e5e7eb;
+    color: #111827;
+    border: none;
+    border-radius: 9999px;
+    text-transform: none;
+}
+
+.reservation-calendar .fc-prev-button,
+.reservation-calendar .fc-next-button {
+    background-color: #1e3a5f;
+    border: none;
+    border-radius: 9999px;
+}
+
+.reservation-calendar
+    .fc-col-header-cell.is-sunday
+    .fc-col-header-cell-cushion {
+    color: #ef4444;
+}
+
+.reservation-calendar
+    .fc-col-header-cell.is-saturday
+    .fc-col-header-cell-cushion {
+    color: #3b82f6;
+}
+
+.reservation-calendar .fc-daygrid-day.fc-day-today {
+    background-color: transparent !important;
+}
+
+.reservation-calendar .fc-daygrid-day.is-saturday {
+    background-color: #eff6ff;
+}
+
+.reservation-calendar .fc-daygrid-day.is-holiday {
+    background-color: #fef2f2;
+}
+
+.reservation-calendar .fc-daygrid-day.is-sunday .fc-daygrid-day-number,
+.reservation-calendar .fc-daygrid-day.is-holiday .fc-daygrid-day-number {
+    color: #ef4444;
+}
+
+.reservation-calendar .fc-daygrid-day.is-saturday .fc-daygrid-day-number {
+    color: #3b82f6;
+}
+
+.reservation-calendar .fc-daygrid-day.is-today .fc-daygrid-day-number {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.reservation-calendar .reservation-holiday-name {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding-left: 0.25rem;
+    font-size: 0.65rem;
+    color: #ef4444;
+    white-space: nowrap;
+}

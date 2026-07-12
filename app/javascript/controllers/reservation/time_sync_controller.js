@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "start", "end" ]
+  static targets = [ "start", "end", "toggle", "endWrapper" ]
 
   sync() {
     if (!this.hasStartTarget || !this.hasEndTarget || !this.startTarget.value) return
@@ -11,6 +11,12 @@ export default class extends Controller {
 
     start.setHours(start.getHours() + 1)
     this.endTarget.value = this.toLocalInputValue(start)
+  }
+
+  toggleEnd() {
+    if (!this.hasToggleTarget || !this.hasEndWrapperTarget) return
+
+    this.endWrapperTarget.classList.toggle("hidden", !this.toggleTarget.checked)
   }
 
   toLocalInputValue(date) {

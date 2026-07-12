@@ -8,7 +8,8 @@ class Reservation::EventsController < Reservation::BaseController
     @calendar_events_json = calendar_events_json(@events)
     @holidays = HolidayJp.between(
       Date.current.beginning_of_year - 1.year, Date.current.end_of_year + 1.year
-    ).map { |holiday| holiday.date.iso8601 }
+    ).to_h { |holiday| [ holiday.date.iso8601, holiday.name ] }
+    @start_date = parse_start_date(params[:start_date])
   end
 
   def new
@@ -61,6 +62,14 @@ class Reservation::EventsController < Reservation::BaseController
     { start_time: date.in_time_zone.change(hour: 10), end_time: date.in_time_zone.change(hour: 11) }
   rescue ArgumentError
     {}
+  end
+
+  def parse_start_date(value)
+    return nil unless value.present?
+
+    Date.parse(value).iso8601
+  rescue ArgumentError
+    nil
   end
 
   def calendar_event_json(event)
