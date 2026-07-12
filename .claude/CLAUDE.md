@@ -65,6 +65,9 @@
 - テストは minitest(Rails 標準)。機能追加時は必ずテストを書く。
 - タイムゾーンは Asia/Tokyo(JST)固定。
 - i18n(config/locales)は使わず、ビューに日本語を直書きする。
+- タイムゾーンは `config/application.rb` の `config.time_zone = "Tokyo"` で設定する。
+  `config.active_record.default_timezone` は変更せず `:utc` のままにする
+  (DB 保存値の解釈を変えないため)。
 
 ## kaikei（会計アプリ）固有ルール
 
@@ -90,6 +93,32 @@
 - 詳細仕様は docs/spec/ を参照し、実装前に必ず確認する
   (ただしこれは移行元 Laravel 版の仕様書であり、既知のバグ・認可漏れ・
   未完成箇所は踏襲せず修正した上で再実装する)。
+
+## reservation(予約カレンダーアプリ)固有ルール
+
+- 個人カレンダー機能。認証はアプリ共通の Google OAuth にそのまま乗り、
+  reservation 独自の認証・セッション実装は持たない。User はトップレベル
+  共有(`app/models/user.rb`)を使い、`has_many :reservation_events,
+  class_name: "Reservation::Event", dependent: :destroy` を持つ。
+  reservation 用の User モデル・独自ユーザーテーブルは作らない。
+- テーブルは `reservation_` プレフィックス(例: `reservation_events`)。
+  モデルは `Reservation::` 名前空間(`Reservation::Event` など)、
+  `self.table_name` で対応。
+- カレンダー表示には FullCalendar を使う。CDN の `<script>` では読み込まず、
+  `bin/importmap pin` で取り込む(Chart.js と同じ扱い)。イベントデータの
+  取得に `events.json` のような JSON API は作らない — サーバー側で
+  描画済みのイベントデータを DOM に埋め込み、それを FullCalendar に渡す。
+  作成・更新・削除は Turbo Streams で行う。これは「フロントエンド全面
+  Hotwire 化・fetch/axios + JSON API 禁止」の全体規約と、JS ライブラリで
+  ある FullCalendar を両立させるための方針であり、`events.json` 相当の
+  ルートが存在しないのは意図的な設計。
+- 祝日表示に `holiday_jp` gem を使う(土曜は青、日曜・祝日は赤)。
+  reservation 機能のために追加した gem。
+- 予定の重複チェック・定員管理・承認フローは持たない
+  (個人スケジュール管理であり、複数ユーザー間の予約調整システムではない)。
+- 詳細仕様は docs/spec/reservation/ を参照し、実装前に必ず確認する
+  (ただしこれは移行元 Rails 版の仕様書であり、known_issues.md に記載の
+  バグ・認可漏れ・未完成箇所は踏襲せず修正した上で再実装する)。
 
 ## 作業ルール
 
