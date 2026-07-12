@@ -1,0 +1,25 @@
+name: vps-rails
+
+services:
+  vps_rails:
+    build: .
+    container_name: vps_rails
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SOLID_QUEUE_IN_PUMA: "true"
+    ports:
+      - "127.0.0.1:3000:80"
+    volumes:
+      - vps_rails_storage:/rails/storage
+    networks:
+      - default
+      - tunnel-net
+
+networks:
+  tunnel-net:
+    external: true
+
+volumes:
+  vps_rails_storage:

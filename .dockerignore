@@ -39,16 +39,12 @@
 # Ignore CI service files.
 /.github
 
-# Ignore Kamal files.
-/config/deploy*.yml
-/.kamal
-
 # Ignore development files
 /.devcontainer
 
 # Ignore migration source data (CSV/SQL dumps, may contain personal info).
 # Never bake these into the image; production import reads them from a
-# path passed via kamal app exec instead.
+# path passed via docker compose exec instead.
 /ignore/
 
 # Ignore Docker-related files
