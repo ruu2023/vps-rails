@@ -48,3 +48,21 @@ docker compose exec vps_rails bin/rails console
 bin/rails kaikei:migrate_legacy_dump
 bin/rails reservation:import_legacy_events 
 ```
+
+## DB ドキュメント(ER・user_id 洗い替え)
+
+- 全テーブル・カラム・リレーション・外部キーの一覧(ER図つき、恒久ドキュメント):
+  `docs/db/er.md`
+  - 重要ポイント: `kaikei_categories` / `kaikei_payment_methods` /
+    `kaikei_budgets` / `kaikei_transactions` / `reservation_events` の
+    **5テーブル全てが `user_id` を直接持つ**(親経由でしか user に
+    紐づかないテーブルは存在しない)。「取引の `user_id` だけ変えれば
+    科目は自動で追随する」という発想は誤り
+- ある user のデータをまるごと別 user に付け替える手順(上記ERをチェック
+  リストとして使う恒久ドキュメント): `docs/db/user-id-reassignment.md`
+  - 新旧ユーザーを両方実在させたまま5テーブルを UPDATE する(FK制約上
+    「先に旧ユーザーを消す」は不可能)、`uid`/`provider` は書き換えない、
+    という2点の設計判断とその根拠を含む
+- 上記手順書が使うバックアップ取得・ロールバック方式(`.backup` +
+  `docker cp`、`docker compose run --rm`、`-wal`/`-shm` の扱い)の実機
+  検証記録: `docs/db/backup-rollback-verification.md`
