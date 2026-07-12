@@ -1,0 +1,16 @@
+_fixture:
+  model_class: Reservation::Event
+
+alice_meeting:
+  user: alice
+  title: 定例ミーティング
+  start_time: <%= 1.day.from_now.change(hour: 10, min: 0).to_s %>
+  end_time: <%= 1.day.from_now.change(hour: 11, min: 0).to_s %>
+  has_end_time: true
+  content: 週次定例
+
+alice_reminder:
+  user: alice
+  title: 通院リマインダー
+  start_time: <%= 2.days.from_now.change(hour: 9, min: 0).to_s %>
+  has_end_time: false

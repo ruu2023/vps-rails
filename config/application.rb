@@ -28,7 +28,10 @@ module VpsRails
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # アプリ全体の設定(reservation 機能の日時表示・入力のために追加)。
+    # DB 保存値の解釈(active_record.default_timezone)は :utc のまま変更しない。
+    config.time_zone = "Tokyo"
   end
 end

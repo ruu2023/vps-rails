@@ -71,17 +71,17 @@
 
 ## §3. 骨組み作成手順(kaikei と同じ型)
 
-- [ ] `Gemfile` に `gem "holiday_jp"` を追加し `bundle install`
-- [ ] `config/routes.rb` に `namespace :reservation do resources :events, except: [:show] end` を追加(既存 `kaikei` ブロックは変更しない)
-- [ ] `app/models/reservation/` ディレクトリを作成
-- [ ] `app/controllers/reservation/base_controller.rb`(`layout "reservation"`)を作成 — `Kaikei::BaseController` と同型
-- [ ] `app/views/layouts/reservation.html.erb` を作成 — `kaikei.html.erb` と同型(`render template: "layouts/application"` で内側から包む)
-- [ ] `app/views/reservation/shared/_header.html.erb` を作成
-- [ ] `app/javascript/controllers/reservation/` ディレクトリを作成
-- [ ] `app/models/user.rb` に `has_many :reservation_events, class_name: "Reservation::Event", dependent: :destroy` を1行追記(既存 kaikei 関連行は変更しない)
-- [ ] `test/controllers/reservation/`, `test/models/reservation/` ディレクトリ、`test/fixtures/reservation_events.yml` を作成
-- [ ] `config/application.rb` に `config.time_zone = "Tokyo"` を追加(確定事項 b。kaikei にも影響する全体変更である旨をコミットメッセージ等に明記する)
-- [ ] `bin/importmap pin` で FullCalendar 関連パッケージ(core / daygrid / interaction 等、必要なプラグインは実装時に importmap pin で解決)を取り込む
+- [x] `Gemfile` に `gem "holiday_jp"` を追加し `bundle install`
+- [x] `config/routes.rb` に `namespace :reservation do resources :events, except: [:show] end` を追加(既存 `kaikei` ブロックは変更しない)
+- [x] `app/models/reservation/` ディレクトリを作成
+- [x] `app/controllers/reservation/base_controller.rb`(`layout "reservation"`)を作成 — `Kaikei::BaseController` と同型
+- [x] `app/views/layouts/reservation.html.erb` を作成 — `kaikei.html.erb` と同型(`render template: "layouts/application"` で内側から包む)
+- [x] `app/views/reservation/shared/_header.html.erb` を作成
+- [x] `app/javascript/controllers/reservation/` ディレクトリを作成(kaikei の toast コントローラに名前空間をまたいで依存しないよう `reservation--toast` を新規作成)
+- [x] `app/models/user.rb` に `has_many :reservation_events, class_name: "Reservation::Event", dependent: :destroy` を1行追記(既存 kaikei 関連行は変更しない)
+- [x] `test/controllers/reservation/`, `test/models/reservation/` ディレクトリ、`test/fixtures/reservation_events.yml` を作成
+- [x] `config/application.rb` に `config.time_zone = "Tokyo"` を追加(確定事項 b。kaikei にも影響する全体変更である旨をコミットメッセージ等に明記する)
+- [x] `bin/importmap pin` で FullCalendar 関連パッケージ(core / daygrid / timegrid / interaction)を取り込む。jspm の内部チャンク分割(`internal.js` 等の相対 import)がフラット vendoring と相性が悪く自動 pin だけでは解決しなかったため、`@fullcalendar/core/internal.js` 等のサブパスと `preact` 一式を個別に pin し、vendor 済みファイル内の相対 import を bare specifier に手動で書き換えて解決した(`config/importmap.rb` 参照)
 
 ---
 
@@ -105,111 +105,189 @@ add_index "reservation_events", "user_id"
 add_foreign_key "reservation_events", "users"
 ```
 
-- [ ] マイグレーションファイル作成
-- [ ] `rails db:migrate`
+- [x] マイグレーションファイル作成
+- [x] `rails db:migrate`
 
 ### §4-2. 既存データ移行(確定事項 e)
 
-移行元に本番データがあるため実施する。**最重要ポイントは user_id の付け替え**:
-移行元 `users.id` と vps-rails `users.id` は一致しないため、`email` をキーに
-vps-rails 側 `User` へマッピングし直す。生 `INSERT` は known_issues のバグ
-(NULL `end_time` 表示不可・`event_params` 二重定義など)由来の不正データを
-無検証のまま持ち込むリスクがあるため使わず、**モデル経由(`Reservation::Event.create!`)**
-でバリデーションを通してインポートする。
+**方針変更(kaikei の移行と同じ形に統一)**: email 経由で行ごとに
+vps-rails 側ユーザーへマッピングする方式は廃止した。移行元は複数ユーザーの
+データを持つが、実際に移行する必要があるのは移行元アカウント1件(42件)のみ
+(残りは vps-rails 側で一度もログインしていないユーザーのデータで、
+移行対象外)。投入先はこのアプリの利用者本人である `User` 1件に固定する。
+これにより「vps-rails 側に未ログインのためスキップ」という問題自体が
+発生しなくなる(kaikei 移行の `KAIKEI_MIGRATION_EMAIL` 固定と同型)。
+メールアドレスは git 管理対象のファイルに直書きしないため、以下では
+移行元アカウントを「移行元アカウント」、投入先アカウントを「投入先アカウント」
+と表記する(実際のメールアドレスは実行時に環境変数で渡す)。
+
+生 `INSERT` は known_issues のバグ(NULL `end_time` 表示不可・`event_params`
+二重定義など)由来の不正データを無検証のまま持ち込むリスクがあるため使わず、
+引き続き**モデル経由(`Reservation::Event.new` + `save`)**でバリデーションを
+通してインポートする。
 
 手順:
 
-1. [ ] `reservation_events` マイグレーションを適用済みにする(§4-1)
-2. [ ] 移行元 DB から `events` と `users` を `email` 付きで CSV エクスポートする
-   (移行元は独自 `users` テーブルを持つため、`user_id` ではなく `email` を
-   経由させる必要がある)
+1. [x] `reservation_events` マイグレーションを適用済みにする(§4-1)
+2. [x] 移行元 DB から移行元アカウントの `events` のみを CSV エクスポートする。
+   投入先ユーザーが固定のため `user_email` 列は不要(`WHERE` で対象ユーザーに
+   絞り込み、`users` との JOIN は絞り込み条件のためだけに使い、SELECT には
+   含めない)
 
    ```bash
    sqlite3 -header -csv db/production.sqlite3 "
      SELECT
        events.title, events.start_time, events.end_time,
-       events.has_end_time, events.content,
-       users.email AS user_email
+       events.has_end_time, events.content
      FROM events
      JOIN users ON users.id = events.user_id
+     WHERE users.email = '<移行元アカウントのメールアドレス>'
    " > reservation_events_import.csv
    ```
 
-3. [ ] CSV を vps-rails 側の作業ディレクトリに配置する(個人情報を含むため
-   `.gitignore` 対象にし、リポジトリにはコミットしない)
-4. [ ] `lib/tasks/reservation_import.rake` を作成し、以下の処理を行う:
-   - CSV を1行ずつ読み込む
-   - `user_email` で vps-rails 側 `User.find_by(email: row["user_email"])` を
-     引く。見つからない行は **スキップしてログに記録**する
-     (vps-rails 側でまだ一度もログインしていないユーザーのデータは
-     移行できない旨をサマリで報告する)
-   - `Reservation::Event.new(title:, start_time:, end_time:, has_end_time:, content:, user: user)`
-     を組み立て、モデルのバリデーションを通して `save!` する
-   - 移行データは過去日時の予定が大半を占める想定のため、`on: :create` の
-     「過去日時禁止」バリデーションだけを import 時に迂回できるようにする
-     (例: `Reservation::Event` に一時属性 `attr_accessor :skip_past_validation`
-     を持たせ、`validate ... unless: :skip_past_validation` とする。
-     通常のコントローラ経由の作成では使用しない、import タスク専用のフラグ)
-   - タイトル必須/50字・終了時刻整合性などの**それ以外のバリデーションは
-     import でも有効なまま**にする(不正データはそのままエラーとして記録し、
-     処理は止めずに次の行へ進める)
-5. [ ] 冪等性の確保: rake タスクの先頭で `Reservation::Event.exists?` を
+3. [x] CSV を vps-rails 側の作業ディレクトリ(`ignore/`)に配置する
+   (個人情報を含むため `.gitignore` 対象にし、リポジトリにはコミットしない。
+   本番では Docker イメージにも焼かないよう `.dockerignore` に `/ignore/`
+   を追加済み。本番投入時は CSV を scp でボリュームか一時パスに置き、
+   `kamal app exec` でそのファイルパスを `RESERVATION_IMPORT_CSV_PATH` に
+   渡して読ませる想定)
+4. [x] `lib/tasks/reservation_import.rake` を次の仕様に修正した:
+   - 投入先 `User` は行ごとに email から引かず、環境変数
+     `RESERVATION_IMPORT_TARGET_EMAIL` で指定した1アカウントに固定して
+     `User.find_by(email: ...)` で取得する(メールアドレスをコードに
+     直書きしない)。未設定または見つからなければ即 `abort`
+   - CSV 全行を、その `User` に紐づけて `Reservation::Event.new(...).save`
+   - 日時は UTC 保存前提で `Time.find_zone("UTC").parse(...)` で読む
+     (`Time.zone.parse` だと JST 誤解釈になるため)。パースに失敗した行は
+     スキップしてログに記録し、処理は継続する
+   - `on: :create` の「過去日時禁止」バリデーションだけ import 時に迂回する
+     (`skip_past_validation` フラグ、既存のまま)。タイトル必須/50字・
+     終了時刻整合性などの**それ以外のバリデーションは import でも有効な
+     まま**にする(不正データはエラーとして記録し、処理は止めずに次の行へ)
+5. [x] 冪等性の確保: rake タスクの先頭で `Reservation::Event.exists?` を
    チェックし、既にデータが1件でもあれば実行前に確認を求める
-   (二重実行による重複投入を防ぐ簡易ガード)
-6. [ ] 実行後、「移行元件数 / 成功件数 / スキップ件数 / エラー件数」の
-   サマリを出力する
-7. [ ] 開発 or ステージング環境でリハーサル実行し、件数・サンプルデータを
-   確認してから本番実行する
+   (二重実行による重複投入を防ぐ簡易ガード。`RESERVATION_IMPORT_FORCE=1`
+   で明示的に上書き実行可能)
+6. [x] 実行後、「対象件数 / 成功件数 / スキップ件数(日時パース不能) /
+   エラー件数(バリデーション失敗)」のサマリを出力する
+7. [x] 開発環境でリハーサル実行し、42件全件が投入先アカウントの `User` に
+   紐づくこと(他ユーザー分は0件)、日時が UTC 保存 → JST 表示
+   で正しく変換されること(例: CSV `2026-05-17 01:00:00` →
+   `start_time.in_time_zone` で `2026-05-17 10:00:00 +0900`)を確認した。
+   成功42件・スキップ0件・エラー0件。再実行時に冪等性ガードが働き
+   `RESERVATION_IMPORT_FORCE=1` なしでは中止されること(件数が84件に
+   増えないこと)も確認済み。リハーサル後は開発DBのデータを削除し
+   クリーンな状態に戻した。本番実行は Phase 6 完了・全体の GO 判断後に
+   一度だけ実施する(未実施)
 
 ---
 
 ## §5. 実装順序(チェックリスト)
 
 ### Phase 0: 骨組み
-- [ ] §3 の内容一式
+- [x] §3 の内容一式
 
 ### Phase 1: モデル
-- [ ] `Reservation::Event` 作成(バリデーション: タイトル必須/50字、
+- [x] `Reservation::Event` 作成(バリデーション: タイトル必須/50字、
       開始時刻必須、作成時のみ過去日時禁止、終了時刻は開始時刻より後
-      〈同時刻も不可〉)
-- [ ] known_issues #1 のバグ(`end_time` NULL がカレンダーに出ない)を
+      〈同時刻も不可〉)。マイグレーション(§4-1)も作成・適用済み
+      (fixture が参照するテーブルが存在しないとテストスイート全体が
+      壊れるため、Phase 0 の直後に前倒しで実施)
+- [x] known_issues #1 のバグ(`end_time` NULL がカレンダーに出ない)を
       再発させないクエリ設計をこの段階で確定する
-      (`(end_time IS NULL OR end_time >= ?)`)
-- [ ] モデルテスト
+      (`(end_time IS NULL OR end_time >= ?)`、`Reservation::Event.within_range` スコープとして実装)
+- [x] モデルテスト(`test/models/reservation/event_test.rb`、known_issues #1 の回帰テスト含む)
 
 ### Phase 2: ルーティング + コントローラ骨格
-- [ ] `Reservation::BaseController`
-- [ ] `Reservation::EventsController`(index/new/create/edit/update/destroy、
+- [x] `Reservation::BaseController`
+- [x] `Reservation::EventsController`(index/new/create/edit/update/destroy、
       `current_user.reservation_events` スコープで認可。known_issues #2 の
-      `event_params` 二重定義は最初から1箇所のみ定義して再発させない)
+      `event_params` 二重定義は最初から1箇所のみ定義して再発させない)。
+      コントローラテスト一式(他ユーザーのイベントへの edit/update/destroy が
+      404 になることの検証を含む)。ビューは暫定の一覧・フォーム表示のみで、
+      FullCalendar 統合は Phase 3 で行う
 
 ### Phase 3: ビュー・カレンダー UI(確定事項 a)
-- [ ] FullCalendar を importmap で pin
-- [ ] サーバー側でイベントデータを描画し DOM(`<script type="application/json">`)
-      に埋め込み、Stimulus コントローラ経由で FullCalendar に渡す
-- [ ] モーダルフォーム(新規作成・編集)、Turbo Frame で開く
-- [ ] 祝日色分け(`holiday_jp`、土曜=青、日曜・祝日=赤)
-- [ ] 終了時刻自動補完(Stimulus `reservation--time-sync`)
+- [x] FullCalendar を importmap で pin(§3 で実施済み)
+- [x] サーバー側でイベントデータを描画し DOM(`<script type="application/json">`)
+      に埋め込み、Stimulus コントローラ(`reservation--calendar`)経由で
+      FullCalendar に渡す。`"/"` を `"\/"` にエスケープして `</script>` による
+      タグ分断を防止
+- [x] モーダルフォーム(新規作成・編集)、Turbo Frame(`#modal`)で開く。
+      日付クリック/イベントクリックは JS 側で非表示リンクの href を書き換えて
+      クリックする方式(`data-turbo-frame="modal"`)で実装。フォーム送信は
+      `data-turbo-frame="_top"` でフレームを離脱しフルページ遷移させ、
+      作成・更新・削除直後にカレンダー全体を最新化する(Phase 4 の
+      Turbo Streams 配信が入るまでの暫定挙動として、同一タブ内は
+      これで完結する)
+- [x] 祝日色分け(`holiday_jp`、土曜=青、日曜・祝日=赤)。祝日データは
+      前後1年を含む3年分を `HolidayJp.between` で events#index で計算し
+      DOM に埋め込み、`dayCellClassNames` で判定
+- [x] 終了時刻自動補完(Stimulus `reservation--time-sync`)
+
+備考: `bin/importmap pin @fullcalendar/...` だけでは jspm の内部チャンク
+分割(`internal.js` 等の相対 import)がフラット vendoring と衝突し解決
+しきれなかったため、サブパスの個別 pin + vendor ファイル内の相対 import
+書き換えで対応した(詳細は §3 の備考、`config/importmap.rb` を参照)。
+実機ブラウザでの検証環境(chromium-cli 等)がサンドボックス内で利用
+できなかったため、`ActionDispatch::Integration::Session` を使った
+実 HTTP リクエストベースでの動作確認(ログイン→作成→カレンダー JSON への
+反映→編集画面表示→削除→JSON から消えることを確認)で代替した。
+ブラウザでの視覚的な確認(カレンダー描画・モーダル開閉・祝日色分けの
+見た目)は未実施のため、実機での確認を推奨する。
 
 ### Phase 4: リアルタイム更新(確定事項 f)
-- [ ] `turbo_stream_from "reservation_events_user_#{current_user.id}"` を
+- [x] `turbo_stream_from "reservation_events_user_#{current_user.id}"` を
       カレンダービューに設置
-- [ ] 作成・更新・削除後に `Turbo::StreamsChannel.broadcast_*_to` で
-      当該ユーザーの他タブへ配信
-- [ ] FullCalendar は Turbo Stream で届いたデータを Stimulus 側で
-      `calendar.refetchEvents()` 相当の API で反映する
-      (Turbo Stream の DOM 置換だけでは FullCalendar の内部状態が
-      更新されないため、Stimulus 側でのブリッジ処理が必要)
+- [x] 作成・更新・削除後に `Turbo::StreamsChannel.broadcast_replace_to` で
+      当該ユーザーの他タブへ配信(`events_controller.rb#broadcast_calendar_refresh`)。
+      イベント一覧全体を JSON 化して `<script id="reservation-calendar-events">`
+      タグを丸ごと差し替える方式(`update` ではなく `replace` を使用 — `update`
+      だと同一 DOM ノードの中身だけが変わり Stimulus の targetConnected が
+      発火しないため、`replace` でノード自体を再生成させる必要がある)
+- [x] FullCalendar は Turbo Stream で届いたデータを Stimulus 側で反映する。
+      `events.json` のような fetch API は存在しないため
+      `calendar.refetchEvents()` は使わず、Stimulus の
+      `eventsTargetConnected(element)` ライフサイクルコールバックで
+      新しい `<script>` の中身を読み、`removeAllEventSources` +
+      `addEventSource` で FullCalendar 内部の状態を差し替えるブリッジ処理を
+      実装した
+- [x] コントローラテストに `assert_turbo_stream_broadcasts` /
+      `assert_no_turbo_stream_broadcasts` を追加(作成・更新・削除で配信、
+      バリデーション失敗時は配信しないことを検証)。実ブラウザでの
+      複数タブ間リアルタイム反映は未検証(サンドボックス内にブラウザ
+      環境がないため)。ペイロード形状(`action="replace"`、正しい
+      `target`、再生成後の `<script>` に全イベントが含まれること)は
+      サーバーサイドで直接確認済み
 
 ### Phase 5: データ移行(確定事項 e)
-- [ ] §4-2 の手順を実施
+- [x] §4-2 の手順を実施(開発環境でのリハーサルまで完了。本番投入は
+      Phase 6 完了・全体の GO 判断後に一度だけ実施する)
 
 ### Phase 6: テスト
-- [ ] モデル/コントローラテスト一式
-- [ ] known_issues 全項目に対する「踏襲していないことの確認」チェックリスト消化
-      (#1 NULL end_time, #2 event_params 二重定義, #3 不要 GET ルート,
-      #4 show 認可漏れ, #10 開発環境自動ログイン, #12 User 一意性
-      〈vps-rails は `validates :uid, uniqueness: { scope: :provider }` 済みのため対応不要〉)
+- [x] モデル/コントローラテスト一式(`bin/rails test` 全体で 58 runs, 0
+      failures, 0 errors。うち reservation 配下は 22 runs)
+- [x] known_issues 全項目に対する「踏襲していないことの確認」チェックリスト消化
+      - #1 NULL end_time: `Reservation::Event.within_range` スコープ
+        (`(end_time IS NULL OR end_time >= ?)`)は実装・回帰テスト済み。
+        ただし `events_controller#index` は範囲指定なしで
+        `current_user.reservation_events.order(:start_time)`(全件)を
+        DOM に埋め込む設計のため、実際には `within_range` を呼び出して
+        いない(呼び出し元なし=未使用コード)。バグとしては発生しない
+        (絞り込み自体がないため)。個人利用規模では全件表示のままで
+        性能上問題にならないと判断し、`index` への組み込みは行わない
+        (ユーザー確認済み)。スコープ・回帰テストは将来の拡張に備えて
+        残す
+      - #2 event_params 二重定義: `events_controller.rb` に1箇所のみ定義。
+        再発なし
+      - #3 不要 GET ルート: `sessions/new|create|destroy` の GET ルートは
+        存在しない(vps-rails 側は元々このルートを持たない設計)
+      - #4 show 認可漏れ: `resources :events, except: [:show]` により
+        `show` アクション自体が存在しない
+      - #10 開発環境自動ログイン: 該当コードなし
+      - #12 User 一意性: vps-rails は
+        `validates :uid, uniqueness: { scope: :provider }` 済みのため
+        対応不要
 
 ---
 

@@ -147,6 +147,7 @@ GEM
       activesupport (>= 6.1)
     hashie (5.1.0)
       logger
+    holiday_jp (0.8.1)
     htmlentities (4.4.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
@@ -474,6 +475,7 @@ DEPENDENCIES
   csv
   debug
   dotenv-rails
+  holiday_jp
   image_processing (~> 1.2)
   importmap-rails
   jbuilder

@@ -31,6 +31,9 @@ gem "omniauth-rails_csrf_protection"
 gem "caxlsx"
 gem "csv"
 
+# Japanese holiday calendar for reservation calendar UI
+gem "holiday_jp"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

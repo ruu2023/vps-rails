@@ -1,0 +1,19 @@
+<%= turbo_stream_from "reservation_events_user_#{current_user.id}" %>
+
+<div class="mx-4 mt-4">
+  <div class="mb-3 flex justify-end">
+    <%= link_to "予定を作成", new_reservation_event_path, data: { turbo_frame: "modal" },
+          class: "rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:opacity-90" %>
+  </div>
+
+  <div data-controller="reservation--calendar" class="rounded-lg bg-white p-4 shadow-md">
+    <div data-reservation--calendar-target="calendar"></div>
+    <script type="application/json" id="reservation-calendar-events"
+            data-reservation--calendar-target="events"><%= raw @calendar_events_json %></script>
+    <%= content_tag :script, raw(@holidays.to_json.gsub("/", '\/')),
+          type: "application/json", data: { "reservation--calendar-target": "holidays" } %>
+    <%= link_to "", "#", data: { "reservation--calendar-target": "modalLink", turbo_frame: "modal" }, class: "hidden" %>
+  </div>
+</div>
+
+<%= turbo_frame_tag "modal" %>

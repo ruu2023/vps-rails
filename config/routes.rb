@@ -17,5 +17,9 @@ Rails.application.routes.draw do
     resource :settings, only: :show
   end
 
+  namespace :reservation do
+    resources :events, except: [ :show ]
+  end
+
   root to: redirect("/kaikei/dashboard")
 end

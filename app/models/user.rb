@@ -3,6 +3,7 @@ class User < ApplicationRecord
   has_many :kaikei_payment_methods, class_name: "Kaikei::PaymentMethod", dependent: :destroy
   has_many :kaikei_transactions, class_name: "Kaikei::Transaction", dependent: :destroy
   has_many :kaikei_budgets, class_name: "Kaikei::Budget", dependent: :destroy
+  has_many :reservation_events, class_name: "Reservation::Event", dependent: :destroy
 
   validates :email, presence: true
   validates :provider, :uid, presence: true

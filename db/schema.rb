@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_11_102353) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_12_160000) do
   create_table "kaikei_budgets", force: :cascade do |t|
     t.integer "amount", null: false
     t.integer "category_id", null: false
@@ -70,6 +70,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_11_102353) do
     t.check_constraint "type IN ('income', 'expense')", name: "kaikei_transactions_type_check"
   end
 
+  create_table "reservation_events", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "end_time"
+    t.boolean "has_end_time", default: false, null: false
+    t.datetime "start_time"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_reservation_events_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "avatar_url"
     t.datetime "created_at", null: false
@@ -88,4 +100,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_11_102353) do
   add_foreign_key "kaikei_transactions", "kaikei_categories", column: "category_id"
   add_foreign_key "kaikei_transactions", "kaikei_payment_methods", column: "payment_method_id"
   add_foreign_key "kaikei_transactions", "users"
+  add_foreign_key "reservation_events", "users"
 end

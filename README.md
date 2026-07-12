@@ -43,4 +43,5 @@ export $(no-proxy=* xargs < .env) && kamal deploy
 - DB マイグレーション
 ```
 bin/rails kaikei:migrate_legacy_dump
+bin/rails reservation:import_legacy_events 
 ```

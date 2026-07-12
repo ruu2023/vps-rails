@@ -1,0 +1,20 @@
+<% content_for :content_for_layout do %>
+  <div class="pointer-events-none fixed inset-x-0 top-4 z-30 flex justify-center px-4">
+    <div class="flex w-full max-w-[480px] flex-col items-end gap-2">
+      <% flash.each do |type, message| %>
+        <div data-controller="reservation--toast"
+             class="pointer-events-auto flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white shadow-md <%= type == "alert" ? "bg-red-500" : "bg-blue-500" %>">
+          <%= message %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mx-auto min-h-screen max-w-4xl bg-gray-50 pb-4">
+    <%= render "reservation/shared/header" %>
+    <main>
+      <%= yield %>
+    </main>
+  </div>
+<% end %>
+<%= render template: "layouts/application" %>
