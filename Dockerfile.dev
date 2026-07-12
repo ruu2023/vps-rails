@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1
+
+# Development-only image. Unlike the production Dockerfile, this does NOT
+# COPY the app into the image — docker-compose.yml bind-mounts the repo at
+# runtime (see the vps_rails_dev service) so source edits are reflected
+# immediately without rebuilding. Rebuild only when Gemfile changes.
+
+ARG RUBY_VERSION=3.4.1
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+WORKDIR /rails
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential curl git libjemalloc2 libvips libyaml-dev pkg-config sqlite3 && \
+    ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+ENV RAILS_ENV="development" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    LD_PRELOAD="/usr/local/lib/libjemalloc.so"
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+EXPOSE 80
+
+# bundle check catches Gemfile changes pulled in via the bind mount without
+# requiring an image rebuild for every gem tweak. tmp/pids/server.pid is
+# removed because it's bind-mounted from the host and would otherwise be
+# left over from the previous container run, blocking startup.
+CMD ["sh", "-c", "bundle check || bundle install && rm -f tmp/pids/server.pid && ./bin/rails db:prepare && ./bin/rails server -b 0.0.0.0 -p 80"]

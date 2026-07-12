@@ -17,9 +17,31 @@ services:
       - default
       - tunnel-net
 
+  vps_rails_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: vps_rails_dev
+    restart: unless-stopped
+    profiles:
+      - dev
+    env_file:
+      - .env
+    volumes:
+      - .:/rails
+      - vps_rails_dev_bundle:/usr/local/bundle
+      - vps_rails_dev_storage:/rails/storage
+    ports:
+      - "127.0.0.1:3001:80"
+    networks:
+      - default
+      - tunnel-net
+
 networks:
   tunnel-net:
     external: true
 
 volumes:
   vps_rails_storage:
+  vps_rails_dev_storage:
+  vps_rails_dev_bundle:

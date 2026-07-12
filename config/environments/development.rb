@@ -6,6 +6,10 @@ Rails.application.configure do
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
+  # Allow the cloudflared dev preview tunnel through Host Authorization
+  # (Rails' default dev allow-list only covers localhost/.test/IPs).
+  config.hosts << "dev.ruu2023.com"
+
   # Do not eager load code on boot.
   config.eager_load = false
 
