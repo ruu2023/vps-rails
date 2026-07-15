@@ -1,5 +1,5 @@
 <header class="sticky top-0 z-10 flex items-center justify-between bg-white px-4 py-4 shadow-md">
-  <h1 class="text-xl font-semibold text-gray-900">予約カレンダー</h1>
+  <%= render "shared/app_switcher", current: :reservation, label: "予約カレンダー", title_class: "text-xl font-semibold text-gray-900" %>
   <div class="flex items-center gap-2">
     <%= button_to logout_path, method: :delete, title: "ログアウト", form: { class: "contents" }, class: "flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-900" do %>
       <i class="fa-regular fa-circle-user"></i>

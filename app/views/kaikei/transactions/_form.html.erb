@@ -1,4 +1,5 @@
 <% input_class = "w-full rounded-kaikei-control bg-kaikei-bg px-4 py-3 text-kaikei-text placeholder:text-kaikei-text-subtle focus:outline-none focus:ring-2 focus:ring-kaikei-primary/20" %>
+<% date_input_class = "w-full rounded-kaikei-control bg-kaikei-bg px-2 py-3 text-kaikei-text focus:outline-none focus:ring-2 focus:ring-kaikei-primary/20" %>
 <% submit_label = local_assigns.fetch(:submit_label, "保存") %>
 <% initial_type = transaction.type.presence || "income" %>
 
@@ -15,7 +16,7 @@
 
     <div>
       <%= f.label :date, "日付", class: "mb-2 block text-sm font-medium text-kaikei-text" %>
-      <%= f.date_field :date, class: input_class %>
+      <%= f.date_field :date, class: date_input_class %>
     </div>
 
     <div>

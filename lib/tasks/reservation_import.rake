@@ -58,8 +58,7 @@ namespace :reservation do
         end_time: end_time,
         has_end_time: row["has_end_time"] == "1",
         content: row["content"],
-        user: user,
-        skip_past_validation: true
+        user: user
       )
 
       if event.save

@@ -17,6 +17,11 @@
    .reservation-calendar でスコープした素の CSS を使う。 */
 .reservation-calendar .fc-toolbar.fc-header-toolbar {
     margin: 0.5em;
+    /* 月の桁数(9月/10月)でタイトル幅が変わっても次月ボタンの位置がずれないよう、
+       横スクロールする .reservation-calendar (min-w-600px) ではなく実ビューポート幅を
+       基準にして両端揃えにする。margin 0.5em(左右計1em)分を差し引く。 */
+    width: calc(100vw - 1em);
+    justify-content: space-between;
 }
 
 .reservation-calendar .fc-toolbar-title {

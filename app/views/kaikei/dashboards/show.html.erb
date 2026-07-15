@@ -70,7 +70,10 @@
     <h2 class="text-base font-semibold text-kaikei-text">最近の取引</h2>
     <%= link_to "すべて表示", kaikei_analytics_path, class: "text-sm text-kaikei-primary" %>
   </div>
-  <ul class="mt-3">
+  <ul class="mt-3 pb-2">
+    <% if @recent_transactions.empty? %>
+      <li class="px-5 py-6 text-center text-sm text-kaikei-text-subtle">取引がありません。</li>
+    <% end %>
     <% @recent_transactions.each do |transaction| %>
       <%= render "kaikei/shared/transaction_item", transaction: transaction %>
     <% end %>

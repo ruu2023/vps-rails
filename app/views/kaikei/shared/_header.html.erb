@@ -2,11 +2,8 @@
   <% if content_for?(:kaikei_header) %>
     <%= yield :kaikei_header %>
   <% else %>
-    <h1 class="text-xl font-semibold text-kaikei-text">会計管理</h1>
+    <%= render "shared/app_switcher", current: :kaikei, label: "会計管理", title_class: "text-xl font-semibold text-kaikei-text" %>
     <div class="flex items-center gap-2">
-      <span class="flex h-9 w-9 items-center justify-center rounded-full bg-kaikei-bg text-kaikei-text">
-        <i class="fa-regular fa-bell"></i>
-      </span>
       <%= button_to logout_path, method: :delete, title: "ログアウト", form: { class: "contents" }, class: "flex h-9 w-9 items-center justify-center rounded-full bg-kaikei-bg text-kaikei-text" do %>
         <i class="fa-regular fa-circle-user"></i>
       <% end %>

@@ -19,10 +19,9 @@ class Reservation::EventTest < ActiveSupport::TestCase
     assert_includes event.errors[:start_time], "can't be blank"
   end
 
-  test "start_time cannot be in the past on create" do
+  test "start_time in the past is allowed on create" do
     event = Reservation::Event.new(user: users(:alice), title: "予定", start_time: 1.day.ago)
-    assert_not event.valid?
-    assert_includes event.errors[:start_time], "未来の時間にしてください"
+    assert event.valid?
   end
 
   test "past start_time is allowed on update" do

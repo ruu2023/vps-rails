@@ -1,5 +1,6 @@
 <%
   input_class = "w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+  datetime_input_class = "w-full rounded-lg border border-gray-300 px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
   close_path = reservation_events_path(start_date: event.start_time&.to_date)
 %>
 
@@ -15,7 +16,11 @@
 
       <%= form_with model: event, scope: :reservation_event, url: url, id: "reservation-event-form",
             class: "min-h-0 flex-1",
-            data: { controller: "reservation--time-sync", turbo_frame: "_top" } do |f| %>
+            data: {
+              controller: "reservation--time-sync",
+              turbo_frame: "_top",
+              "reservation--time-sync-confirm-past-value": event.new_record?
+            } do |f| %>
         <div class="h-full space-y-4 overflow-y-auto px-5 py-4">
           <% if event.errors.any? %>
             <div class="rounded-lg border border-pink-200 bg-pink-50 p-3 text-sm text-pink-600">
@@ -40,7 +45,7 @@
                 <span class="text-xs text-pink-600"><%= event.errors[:start_time].first %></span>
               <% end %>
             </div>
-            <%= f.datetime_field :start_time, class: input_class,
+            <%= f.datetime_field :start_time, class: datetime_input_class,
                   data: { "reservation--time-sync-target": "start", action: "change->reservation--time-sync#sync" } %>
           </div>
 
@@ -59,7 +64,7 @@
             <% if event.errors[:end_time].any? %>
               <p class="mb-1 text-xs text-pink-600"><%= event.errors[:end_time].first %></p>
             <% end %>
-            <%= f.datetime_field :end_time, class: input_class, data: { "reservation--time-sync-target": "end" } %>
+            <%= f.datetime_field :end_time, class: datetime_input_class, data: { "reservation--time-sync-target": "end" } %>
           </div>
 
           <div>

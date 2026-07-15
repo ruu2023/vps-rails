@@ -9,13 +9,13 @@
 - ルーティングは名前空間で分離する:
 
     namespace :kaikei do
-      resources :transactions
-      # ...
+    resources :transactions # ...
     end
 
-  → URL は `/kaikei/transactions`、コントローラは
+    → URL は `/kaikei/transactions`、コントローラは
     `app/controllers/kaikei/transactions_controller.rb`、
     モデルは `app/models/kaikei/` 配下(`Kaikei::Transaction` など)。
+
 - 各機能は自分の名前空間の中で完結させる。機能をまたぐ共有は極力しない。
   共通で使うものだけ名前空間なしのトップレベルに置く(認証、レイアウト、
   共通 concern など)。
@@ -24,7 +24,7 @@
   取り合う事故を防ぐため。モデルは以下で対応:
 
     class Kaikei::Transaction < ApplicationRecord
-      self.table_name = "kaikei_transactions"
+    self.table_name = "kaikei_transactions"
     end
 
 ## ディレクトリ規約
@@ -65,7 +65,7 @@
 - テストは minitest(Rails 標準)。機能追加時は必ずテストを書く。
 - タイムゾーンは Asia/Tokyo(JST)固定。
 - i18n(config/locales)は使わず、ビューに日本語を直書きする。
-- タイムゾーンは `config/application.rb` の `config.time_zone = "Tokyo"` で設定する。
+- タイムゾーンは `config/application.rb` の `config.time_zone = "Tokyo"` であする。
   `config.active_record.default_timezone` は変更せず `:utc` のままにする
   (DB 保存値の解釈を変えないため)。
 
@@ -99,7 +99,7 @@
 - 個人カレンダー機能。認証はアプリ共通の Google OAuth にそのまま乗り、
   reservation 独自の認証・セッション実装は持たない。User はトップレベル
   共有(`app/models/user.rb`)を使い、`has_many :reservation_events,
-  class_name: "Reservation::Event", dependent: :destroy` を持つ。
+class_name: "Reservation::Event", dependent: :destroy` を持つ。
   reservation 用の User モデル・独自ユーザーテーブルは作らない。
 - テーブルは `reservation_` プレフィックス(例: `reservation_events`)。
   モデルは `Reservation::` 名前空間(`Reservation::Event` など)、
