@@ -1,0 +1,15 @@
+<div class="relative" data-controller="dropdown" data-action="click@window->dropdown#closeIfOutside">
+  <button type="button" data-action="click->dropdown#toggle"
+          class="flex h-9 w-9 items-center justify-center rounded-full <%= local_assigns.fetch(:button_class, "bg-gray-100 text-gray-900") %>">
+    <i class="fa-regular fa-circle-user"></i>
+  </button>
+
+  <div data-dropdown-target="menu"
+       class="pointer-events-none absolute right-0 top-full z-20 mt-2 w-56 origin-top-right scale-95 rounded-lg bg-white py-1 opacity-0 shadow-lg ring-1 ring-black/5 transition">
+    <p class="truncate px-4 py-2 text-sm text-gray-500"><%= current_user.email %></p>
+    <%= button_to logout_path, method: :delete, form: { class: "contents" },
+          class: "block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50" do %>
+      ログアウト
+    <% end %>
+  </div>
+</div>

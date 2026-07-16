@@ -21,5 +21,5 @@ Rails.application.routes.draw do
     resources :events, except: [ :show ]
   end
 
-  root to: redirect("/kaikei/dashboard")
+  root to: redirect("/reservation/events")
 end
