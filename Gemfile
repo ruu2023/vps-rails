@@ -31,6 +31,10 @@ gem "omniauth-rails_csrf_protection"
 gem "caxlsx"
 gem "csv"
 
+# Server-side PDF generation for kaikei exports
+gem "prawn"
+gem "prawn-table"
+
 # Japanese holiday calendar for reservation calendar UI
 gem "holiday_jp"
 

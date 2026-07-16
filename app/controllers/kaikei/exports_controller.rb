@@ -1,4 +1,6 @@
 require "csv"
+require "prawn"
+require "prawn/table"
 
 class Kaikei::ExportsController < Kaikei::BaseController
   def new
@@ -7,20 +9,18 @@ class Kaikei::ExportsController < Kaikei::BaseController
   def create
     start_date = params[:start_date]
     end_date = params[:end_date]
-    kind = params[:kind] # "transactions" or "journal"
-    format = params[:format] # "csv" or "excel"
+    kind = params[:kind] # "transactions", "journal", or "categories"
+    format = params[:format] # "csv", "excel", or "pdf"
 
-    transactions = current_user.kaikei_transactions
-      .includes(:category, :payment_method)
-      .where(date: start_date..end_date)
-      .order(:date)
+    headers_row, rows = kind == "categories" ? category_export_data : transaction_export_data(kind, start_date, end_date)
 
-    rows = build_rows(transactions, kind)
-    headers_row = kind == "journal" ? journal_headers : transaction_headers
-
-    if format == "excel"
+    case format
+    when "excel"
       send_data build_excel(headers_row, rows), filename: "#{export_filename(kind, start_date, end_date)}.xlsx",
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    when "pdf"
+      send_data build_pdf(KIND_LABELS.fetch(kind, kind), headers_row, rows),
+        filename: "#{export_filename(kind, start_date, end_date)}.pdf", type: "application/pdf"
     else
       send_data build_csv(headers_row, rows), filename: "kaikei_export.csv", type: "text/csv"
     end
@@ -32,8 +32,26 @@ class Kaikei::ExportsController < Kaikei::BaseController
 
   TYPE_LABELS = { "income" => "収入", "expense" => "支出" }.freeze
 
+  JP_FONT_PATH = Rails.root.join("app/assets/fonts/NotoSansJP-Regular.ttf")
+
   def export_filename(kind, start_date, end_date)
-    "#{KIND_LABELS.fetch(kind, kind)}_#{start_date}_#{end_date}"
+    kind == "categories" ? KIND_LABELS.fetch(kind, kind) : "#{KIND_LABELS.fetch(kind, kind)}_#{start_date}_#{end_date}"
+  end
+
+  def transaction_export_data(kind, start_date, end_date)
+    transactions = current_user.kaikei_transactions
+      .includes(:category, :payment_method)
+      .where(date: start_date..end_date)
+      .order(:date)
+
+    headers_row = kind == "journal" ? journal_headers : transaction_headers
+    [ headers_row, build_rows(transactions, kind) ]
+  end
+
+  def category_export_data
+    categories = current_user.kaikei_categories.order(:sort_order)
+    rows = categories.map { |c| [ c.name, TYPE_LABELS.fetch(c.default_type, c.default_type), c.sort_order ] }
+    [ category_headers, rows ]
   end
 
   def transaction_headers
@@ -42,6 +60,10 @@ class Kaikei::ExportsController < Kaikei::BaseController
 
   def journal_headers
     [ "取引日", "借方", "借方金額", "貸方", "貸方金額", "摘要" ]
+  end
+
+  def category_headers
+    [ "科目名", "収支区分", "表示順" ]
   end
 
   def build_rows(transactions, kind)
@@ -73,6 +95,21 @@ class Kaikei::ExportsController < Kaikei::BaseController
       rows.each { |row| csv << row }
     end
     "﻿#{csv}"
+  end
+
+  def build_pdf(title, headers_row, rows)
+    Prawn::Document.new(page_layout: :landscape, margin: 36) do |pdf|
+      pdf.font_families.update("NotoSansJP" => { normal: JP_FONT_PATH })
+      pdf.font "NotoSansJP"
+
+      pdf.text title, size: 16
+      pdf.move_down 12
+      pdf.table [ headers_row, *rows ], header: true, width: pdf.bounds.width do
+        row(0).background_color = "EEEEEE"
+        cells.size = 9
+        cells.padding = [ 4, 6 ]
+      end
+    end.render
   end
 
   def build_excel(headers_row, rows)

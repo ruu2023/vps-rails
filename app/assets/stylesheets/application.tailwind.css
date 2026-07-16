@@ -12,6 +12,18 @@
 
 */
 
+/* iOS Safari は input[type="date"]・input[type="datetime-local"] のカレンダー
+   アイコン等の内部要素分の幅を width指定と無関係に確保するため、隣接する
+   他のinputよりも横に伸びて見える。appearanceを解除してボックスモデルに
+   よる幅計算に委ねる(タップで開くネイティブの日付ピッカー自体の挙動には
+   影響しない)。 */
+input[type="date"],
+input[type="datetime-local"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 0;
+}
+
 /* reservation（予約カレンダー）: docs/spec/reservation/front-detail.md 準拠の FullCalendar 装飾。
    FullCalendar が生成する DOM クラスへの上書きなので Tailwind ユーティリティでは表現できず、
    .reservation-calendar でスコープした素の CSS を使う。 */
